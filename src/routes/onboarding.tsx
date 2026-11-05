@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { api, USE_MOCK_API } from "@/lib/api";
 import {
@@ -52,6 +52,18 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/onboarding")({
+  beforeLoad: async () => {
+    if (!USE_MOCK_API) {
+      const user = await api.auth.getCurrentUser();
+      if (!user) {
+        throw redirect({
+          to: "/login",
+          search: { redirect: "/onboarding" },
+        });
+      }
+      return { user };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Onboarding — Alohomora!" },
@@ -592,7 +604,7 @@ export function Onboarding() {
               <div className="rounded-2xl border border-gold-muted/30 bg-gold/5 p-4">
                 <div className="flex items-center gap-2 text-base font-bold text-gold uppercase tracking-wider mb-3">
                   <Lock className="size-3.5" />
-                  <span>Account Information (from your registration � read-only)</span>
+                  <span>Verified Student Identity (from registration)</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="space-y-1">

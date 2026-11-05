@@ -1,9 +1,11 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Compass, FlaskConical, Map as MapIcon, MessageCircle, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Compass, FlaskConical, Map as MapIcon, MessageCircle, Sparkles, UserCheck } from "lucide-react";
 import heroImg from "@/assets/hero-library.jpg";
 import { LogoLockup } from "@/components/Brand";
 import { Owl } from "@/components/Owl";
 import { Button } from "@/components/ui/button";
+import { api, USE_MOCK_API, type AuthUser } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -61,6 +63,25 @@ const STEPS = [
 ];
 
 function Landing() {
+  const [currentUser, setCurrentUser] = useState<AuthUser | null | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    api.auth
+      .getCurrentUser()
+      .then((user) => {
+        if (mounted) setCurrentUser(user);
+      })
+      .catch(() => {
+        if (mounted) setCurrentUser(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const isLoggedIn = Boolean(currentUser);
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-gold-muted/25 bg-parchment/85 backdrop-blur-md">
@@ -69,17 +90,35 @@ function Landing() {
             <LogoLockup size={38} />
           </Link>
           <nav className="flex items-center gap-2 sm:gap-3">
-            <Link
-              to="/onboarding"
-              className="hidden text-sm font-medium text-plum underline-offset-4 hover:underline sm:inline"
-            >
-              Take the tour
-            </Link>
-            <Button asChild className="btn-sparkle glow-magic font-semibold">
-              <Link to="/dashboard">
-                Enter the Great Hall <ArrowRight className="size-4" />
-              </Link>
-            </Button>
+            {isLoggedIn ? (
+              <>
+                <Link
+                  to="/onboarding"
+                  className="hidden text-sm font-medium text-plum underline-offset-4 hover:underline sm:inline"
+                >
+                  Take the tour
+                </Link>
+                <Button asChild className="btn-sparkle glow-magic font-semibold">
+                  <Link to="/dashboard">
+                    Enter the Great Hall <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-plum underline-offset-4 hover:underline"
+                >
+                  Log in
+                </Link>
+                <Button asChild className="btn-sparkle glow-magic font-semibold">
+                  <Link to="/register">
+                    Register <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -99,12 +138,25 @@ function Landing() {
               Your degree tells the world what you studied. <strong className="text-foreground">Alohomora! helps you prove what you can do</strong> — for university students in Bangladesh ready to bridge the gap between lectures and industry.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="btn-sparkle glow-magic animate-pulse-soft font-semibold">
-                <Link to="/dashboard">Enter the Great Hall</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="gold-frame bg-card font-semibold">
-                <Link to="/onboarding">Take the 2-minute tour</Link>
-              </Button>
+              {isLoggedIn ? (
+                <>
+                  <Button asChild size="lg" className="btn-sparkle glow-magic animate-pulse-soft font-semibold">
+                    <Link to="/dashboard">Enter the Great Hall</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="gold-frame bg-card font-semibold">
+                    <Link to="/onboarding">Take the 2-minute tour</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild size="lg" className="btn-sparkle glow-magic animate-pulse-soft font-semibold">
+                    <Link to="/register">Create an account to start</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="gold-frame bg-card font-semibold">
+                    <Link to="/login">Sign in with Student ID</Link>
+                  </Button>
+                </>
+              )}
             </div>
             <p className="mt-4 font-lore text-sm text-plum/80 italic">
               "Every expert was once a student with a wand and a deadline." — The Keykeeper Owl
@@ -169,7 +221,9 @@ function Landing() {
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild className="btn-sparkle glow-magic font-semibold">
-              <Link to="/onboarding">Begin your first chapter</Link>
+              <Link to={isLoggedIn ? "/onboarding" : "/register"}>
+                {isLoggedIn ? "Begin your first chapter" : "Create your account to start"}
+              </Link>
             </Button>
             <span className="text-xs text-muted-foreground">Free prototype · demo data, no real listings yet</span>
           </div>
