@@ -60,10 +60,10 @@ export function generatePlan(
       const kind = kinds[di] ?? "Learn";
       if (kind === "Rest") return []; // rest day: no task
       let title: string;
-      if (kind === "Learn") title = `Learn: ${practice} — ${skill.name} fundamentals`;
-      else if (kind === "Practice") title = `Practice: ${di % 2 === 0 ? "guided exercise" : "self-made challenge"} for ${skill.name}`;
-      else if (kind === "Build") title = `Build: apply ${skill.name} in your running mini-project`;
-      else title = `Share: document your ${skill.name} progress in the Spellbook`;
+      if (kind === "Learn") title = `Learn: ${practice}`;
+      else if (kind === "Practice") title = `Practice: ${di % 2 === 0 ? "core exercise" : "mini challenge"}`;
+      else if (kind === "Build") title = `Build: add to mini project`;
+      else title = `Share: write up progress`;
       const task: PlanTask = {
         id: `w${wi + 1}-d${di + 1}`,
         day,
@@ -78,7 +78,7 @@ export function generatePlan(
     return {
       id: `week-${wi + 1}`,
       focusSkill: skill.id,
-      goal: `Week ${wi + 1}: ${skill.name} — ${area.status === "missing" ? "from zero to a working example" : "from rusty to demonstrable"}`,
+      goal: `Week ${wi + 1}: ${skill.name}`,
       tasks,
     };
   });

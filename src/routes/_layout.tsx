@@ -30,6 +30,7 @@ import { DemoBadge } from "@/components/StatusPill";
 import { useApp } from "@/state/app-state";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { VantaFogBackground } from "@/components/VantaFogBackground";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,11 +109,11 @@ function SidebarContent({
       {NAV.map((group) => (
         <div key={group.group} className="mb-3">
           {!collapsed && (
-            <p className="px-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-fairy/70">
+            <p className="px-5 pb-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-fairy/70">
               {group.group}
             </p>
           )}
-          <ul className="space-y-0.5 px-2.5">
+          <ul className="space-y-1 px-3">
             {group.items.map((item) => {
               const active = pathname === item.to;
               return (
@@ -123,18 +124,18 @@ function SidebarContent({
                     aria-current={active ? "page" : undefined}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                      "group flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-base transition-colors min-h-[48px]",
                       active
-                        ? "bg-gold/20 text-gold shadow-[inset_0_0_0_1px_oklch(0.852_0.107_88.5/0.35)]"
+                        ? "bg-gold/20 text-gold shadow-[inset_0_0_0_1px_oklch(0.852_0.107_88.5/0.35)] font-semibold"
                         : "text-cream/85 hover:bg-lavender/10 hover:text-cream",
                       collapsed && "justify-center px-0",
                     )}
                   >
-                    <item.icon className={cn("size-[18px] shrink-0", active ? "text-gold" : "text-lavender group-hover:text-gold")} />
+                    <item.icon className={cn("size-5 shrink-0", active ? "text-gold" : "text-lavender group-hover:text-gold")} />
                     {!collapsed && (
                       <span className="flex min-w-0 flex-col">
-                        <span className="truncate font-medium leading-tight">{item.label}</span>
-                        <span className="truncate text-[11px] text-fairy/80">{item.hint}</span>
+                        <span className="truncate font-semibold text-base leading-tight">{item.label}</span>
+                        <span className="truncate text-sm text-fairy/80">{item.hint}</span>
                       </span>
                     )}
                   </Link>
@@ -144,8 +145,8 @@ function SidebarContent({
           </ul>
         </div>
       ))}
-      {!collapsed && (
-        <p className="mt-auto px-5 pt-3 text-[10px] leading-relaxed text-fairy/60">
+      {!collapsed && USE_MOCK_API && (
+        <p className="mt-auto px-5 pt-3 text-xs leading-relaxed text-fairy/60">
           Alohomora! prototype · demo data only
         </p>
       )}
@@ -174,21 +175,24 @@ function DashboardShell() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen bg-transparent">
+      {/* Vanta FOG WebGL canvas mounted once behind all authenticated routes */}
+      <VantaFogBackground />
+
       {/* Desktop sidebar */}
       <aside
         className={cn(
           "plum-panel fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-gold/15 transition-[width] duration-200 md:flex",
-          collapsed ? "w-[72px]" : "w-64",
+          collapsed ? "w-[72px]" : "w-[272px]",
         )}
       >
         <SidebarContent collapsed={collapsed} />
         <button
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="absolute -right-3.5 top-6 z-50 flex size-7 items-center justify-center rounded-full border border-gold/40 bg-plum text-gold transition-transform hover:scale-110"
+          className="absolute -right-3.5 top-6 z-50 flex size-8 items-center justify-center rounded-full border border-gold/40 bg-plum text-gold transition-transform hover:scale-110"
         >
-          <ChevronLeft className={cn("size-4 transition-transform", collapsed && "rotate-180")} />
+          <ChevronLeft className={cn("size-5 transition-transform", collapsed && "rotate-180")} />
         </button>
       </aside>
 
@@ -204,25 +208,25 @@ function DashboardShell() {
         />
         <aside
           className={cn(
-            "plum-panel absolute inset-y-0 left-0 w-72 border-r border-gold/15 shadow-2xl transition-transform duration-300",
+            "plum-panel absolute inset-y-0 left-0 w-80 border-r border-gold/15 shadow-2xl transition-transform duration-300",
             drawerOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <button
             onClick={() => setDrawerOpen(false)}
             aria-label="Close navigation"
-            className="absolute right-3 top-4 flex size-8 items-center justify-center rounded-full text-cream/80 hover:bg-lavender/10"
+            className="absolute right-3 top-4 flex size-9 items-center justify-center rounded-full text-cream/80 hover:bg-lavender/10"
           >
-            <X className="size-4" />
+            <X className="size-5" />
           </button>
           <SidebarContent collapsed={false} onNavigate={() => setDrawerOpen(false)} />
         </aside>
       </div>
 
       {/* Main column */}
-      <div className={cn("flex min-h-screen flex-col transition-[padding] duration-200", collapsed ? "md:pl-[72px]" : "md:pl-64")}>
-        <header className="sticky top-0 z-30 border-b border-gold-muted/25 bg-parchment/85 backdrop-blur-md">
-          <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
+      <div className={cn("flex min-h-screen flex-col transition-[padding] duration-200", collapsed ? "md:pl-[72px]" : "md:pl-[272px]")}>
+        <header className="sticky top-0 z-30 border-b border-gold-muted/25 bg-[#FFF9EF]/90 backdrop-blur-md">
+          <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-4 px-4 sm:px-6 xl:px-8">
             <button
               className="flex size-9 items-center justify-center rounded-lg text-plum hover:bg-gold/20 md:hidden"
               onClick={() => setDrawerOpen(true)}
@@ -338,25 +342,27 @@ function DashboardShell() {
 
         {!state.onboarded && (
           <div className="border-b border-gold-muted/25 bg-gold/20">
-            <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 text-sm sm:px-6">
+            <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-2 px-4 sm:px-6 xl:px-8 py-2 text-sm sm:text-base">
               <Owl size={26} animate={false} alt="" />
               <span className="text-plum">The Keykeeper wants to know you — finish the 2-minute tour to personalize your map.</span>
-              <Button asChild size="sm" variant="link" className="ml-auto h-auto p-0 text-plum underline">
+              <Button asChild size="sm" variant="link" className="ml-auto h-auto p-0 text-plum underline text-sm sm:text-base">
                 <Link to="/onboarding">Take the tour</Link>
               </Button>
             </div>
           </div>
         )}
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 sm:px-6 xl:px-8 py-8 sm:py-12">
           <Outlet />
         </main>
 
-        <footer className="border-t border-gold-muted/25 py-4">
-          <p className="mx-auto max-w-6xl px-4 text-center text-[11px] text-muted-foreground sm:px-6">
-            Alohomora! prototype · Opportunities, courses and sponsors shown are demo data, not live offers · Made with ✦ for university students in Bangladesh
-          </p>
-        </footer>
+        {USE_MOCK_API && (
+          <footer className="border-t border-gold-muted/25 py-4">
+            <p className="mx-auto max-w-[1440px] px-4 text-center text-sm text-muted-foreground sm:px-6 xl:px-8">
+              Alohomora! prototype · Opportunities, courses and sponsors shown are demo data, not live offers · Made with ✦ for university students in Bangladesh
+            </p>
+          </footer>
+        )}
       </div>
     </div>
   );

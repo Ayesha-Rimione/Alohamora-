@@ -21,6 +21,7 @@ export interface AssessedSkill {
   status?: LegacySkillStatus; // legacy status string fallback
   confidence?: number;
   evidence?: string;
+  hasEvidence?: boolean;
 }
 
 export const LEVEL_TO_STATUS: Record<number, LegacySkillStatus> = {
@@ -52,16 +53,19 @@ export interface CoverageDetail {
   assessedLevel: number;
   ratio: number; // min(aᵢ / rᵢ, 1)
   status: LegacySkillStatus;
+  hasEvidence: boolean;
 }
 
 export interface CoverageResult {
   percent: number;
+  evidencePercent: number;
   weightedScore: number;
   totalWeight: number;
   details: CoverageDetail[];
   demonstratedCount: number;
   developingCount: number;
   missingCount: number;
+  evidenceCount: number;
 }
 
 /**
@@ -89,12 +93,14 @@ export function computeSkillCoverage(
   if (!required || required.length === 0) {
     return {
       percent: 0,
+      evidencePercent: 0,
       weightedScore: 0,
       totalWeight: 0,
       details: [],
       demonstratedCount: 0,
       developingCount: 0,
       missingCount: 0,
+      evidenceCount: 0,
     };
   }
 
@@ -103,6 +109,7 @@ export function computeSkillCoverage(
   let demonstratedCount = 0;
   let developingCount = 0;
   let missingCount = 0;
+  let evidenceCount = 0;
 
   const details: CoverageDetail[] = [];
 
@@ -114,6 +121,10 @@ export function computeSkillCoverage(
     const assessed = assessedSkills[skillId];
     const assessedLevel = getAssessedLevel(assessed);
     const ratio = targetLevel > 0 ? Math.min(assessedLevel / targetLevel, 1) : 0;
+
+    const hasEvidence = typeof assessed === "object" && assessed !== null
+      ? Boolean(assessed.hasEvidence || (assessed.evidence && assessed.evidence.trim().length > 0))
+      : false;
 
     totalWeight += weight;
     totalWeightedAchieved += weight * ratio;
@@ -129,6 +140,8 @@ export function computeSkillCoverage(
       missingCount++;
     }
 
+    if (hasEvidence) evidenceCount++;
+
     details.push({
       skillId,
       weight,
@@ -136,18 +149,22 @@ export function computeSkillCoverage(
       assessedLevel,
       ratio,
       status,
+      hasEvidence,
     });
   }
 
   const percent = totalWeight > 0 ? Math.round((totalWeightedAchieved / totalWeight) * 100) : 0;
+  const evidencePercent = required.length > 0 ? Math.round((evidenceCount / required.length) * 100) : 0;
 
   return {
     percent,
+    evidencePercent,
     weightedScore: Number(totalWeightedAchieved.toFixed(2)),
     totalWeight,
     details,
     demonstratedCount,
     developingCount,
     missingCount,
+    evidenceCount,
   };
 }

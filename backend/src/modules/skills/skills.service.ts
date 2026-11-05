@@ -196,14 +196,25 @@ export class SkillsService {
       throw new AppError("not_found", `Role '${targetRoleId}' not found`, 404);
     }
 
-    const userSkills = await prisma.userSkill.findMany({ where: { userId } });
-    const assessedMap: Record<string, { level: number; status: SkillStatus; confidence: number }> = {};
+    const userSkills = await prisma.userSkill.findMany({
+      where: { userId },
+      include: { evidences: true },
+    });
+
+    const userEvidences = await prisma.skillEvidence.findMany({ where: { userId } });
+    const evidenceSkillSet = new Set([
+      ...userSkills.filter((us) => us.evidences && us.evidences.length > 0).map((us) => us.skillId),
+      ...userEvidences.map((e) => e.skillId),
+    ]);
+
+    const assessedMap: Record<string, { level: number; status: SkillStatus; confidence: number; hasEvidence: boolean }> = {};
 
     for (const us of userSkills) {
       assessedMap[us.skillId] = {
         level: us.level,
         status: us.status as SkillStatus,
         confidence: us.confidence,
+        hasEvidence: evidenceSkillSet.has(us.skillId),
       };
     }
 
@@ -213,10 +224,15 @@ export class SkillsService {
       targetLevel: r.targetLevel,
     }));
 
+    // Check onboarding completion
+    const onboarding = await prisma.onboardingProgress.findUnique({ where: { userId } });
+    const isOnboarded = Boolean(onboarding?.completedAt);
+
     const coverage = computeSkillCoverage(requirements, assessedMap);
     const { currentMilestoneIndex, milestones } = generateMarauderMapMilestones(
       role.requirements.map((r) => r.skillId),
       coverage,
+      { isOnboarded },
     );
 
     // Identify first recommended quest (first missing or developing skill)
@@ -239,9 +255,12 @@ export class SkillsService {
       roleId: role.id,
       roleTitle: role.title,
       coveragePercent: coverage.percent,
+      evidencePercent: coverage.evidencePercent,
       demonstratedCount: coverage.demonstratedCount,
       developingCount: coverage.developingCount,
       missingCount: coverage.missingCount,
+      evidenceCount: coverage.evidenceCount,
+      isOnboarded,
       currentMilestoneIndex,
       milestones,
       firstQuest,

@@ -56,7 +56,7 @@ Alohomora!/
 ## 1 — Frontend Setup
 
 ```powershell
-# Install dependencies (already done if you cloned from Lovable)
+# Install dependencies
 npm install
 
 # Start frontend dev server (mock API mode — no backend needed)

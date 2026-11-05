@@ -83,17 +83,34 @@ export interface MapMilestonePayload {
   room: string;
   status: "completed" | "active" | "upcoming";
   skills: string[];
+  requirementsDescription?: string;
+  isSatisfied?: boolean;
+}
+
+export interface MapCoverageDetail {
+  skillId: string;
+  weight: number;
+  targetLevel: number;
+  assessedLevel: number;
+  ratio: number;
+  status: SkillStatus;
+  hasEvidence: boolean;
 }
 
 export interface MapPayload {
   roleId: string;
   roleTitle: string;
   coveragePercent: number;
+  evidencePercent?: number;
   demonstratedCount: number;
   developingCount: number;
   missingCount: number;
+  evidenceCount?: number;
+  isOnboarded?: boolean;
   currentMilestoneIndex: number;
   milestones: MapMilestonePayload[];
+  firstQuest?: { skillId: string; name: string; quest: string } | null;
+  details?: MapCoverageDetail[];
 }
 
 export interface ChatResponse {

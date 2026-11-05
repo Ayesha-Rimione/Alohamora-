@@ -101,21 +101,52 @@ describe("LEVEL_TO_STATUS mapping", () => {
 });
 
 describe("generateMarauderMapMilestones", () => {
-  it("marks starting-gate as completed always", () => {
-    const { milestones } = generateMarauderMapMilestones(
+  it("marks starting-gate as completed only when isOnboarded is true", () => {
+    const { milestones: completedGate } = generateMarauderMapMilestones(
       ["python", "sql"],
-      { percent: 0, weightedScore: 0, totalWeight: 2, details: [], demonstratedCount: 0, developingCount: 0, missingCount: 2 },
+      { percent: 0, evidencePercent: 0, weightedScore: 0, totalWeight: 2, details: [], demonstratedCount: 0, developingCount: 0, missingCount: 2, evidenceCount: 0 },
+      { isOnboarded: true },
     );
-    expect(milestones[0]?.id).toBe("starting-gate");
-    expect(milestones[0]?.status).toBe("completed");
+    expect(completedGate[0]?.id).toBe("starting-gate");
+    expect(completedGate[0]?.status).toBe("completed");
+
+    const { milestones: activeGate } = generateMarauderMapMilestones(
+      ["python", "sql"],
+      { percent: 0, evidencePercent: 0, weightedScore: 0, totalWeight: 2, details: [], demonstratedCount: 0, developingCount: 0, missingCount: 2, evidenceCount: 0 },
+      { isOnboarded: false },
+    );
+    expect(activeGate[0]?.id).toBe("starting-gate");
+    expect(activeGate[0]?.status).toBe("active");
+    expect(activeGate[1]?.status).toBe("upcoming");
   });
 
-  it("sets library-foundations as active at low coverage", () => {
-    const { milestones } = generateMarauderMapMilestones(
-      ["python", "sql", "ml"],
-      { percent: 10, weightedScore: 0.3, totalWeight: 3, details: [], demonstratedCount: 0, developingCount: 1, missingCount: 2 },
-    );
-    expect(milestones[1]?.status).toBe("active");
+  it("advances library-foundations to completed when foundation skills are satisfied", () => {
+    const required = ["python", "sql", "git-collab", "portfolio-projects"];
+    const assessed = {
+      python: { level: 3, hasEvidence: false }, // foundation satisfied
+      sql: { level: 0 },
+      "git-collab": { level: 0 },
+      "portfolio-projects": { level: 0 },
+    };
+    const coverage = computeSkillCoverage(required, assessed);
+    const { milestones } = generateMarauderMapMilestones(required, coverage, { isOnboarded: true });
+
+    expect(milestones[0]?.status).toBe("completed"); // starting gate
+    expect(milestones[1]?.id).toBe("library-foundations");
+    expect(milestones[1]?.status).toBe("completed"); // python is chunk 1
+    expect(milestones[2]?.status).toBe("active"); // workshop of quests is now active
+  });
+
+  it("calculates separate skill coverage and evidence coverage", () => {
+    const required = ["python", "sql"];
+    const assessed = {
+      python: { level: 4, hasEvidence: true },
+      sql: { level: 4, hasEvidence: false },
+    };
+    const coverage = computeSkillCoverage(required, assessed);
+    expect(coverage.percent).toBe(100); // 100% self-assessed skill coverage
+    expect(coverage.evidencePercent).toBe(50); // only 1 of 2 skills has attached evidence
+    expect(coverage.evidenceCount).toBe(1);
   });
 });
 

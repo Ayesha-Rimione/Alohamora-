@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MAP_REALM_BOUNDS,
   SAMPLE_EDGES,
@@ -10,7 +10,10 @@ import {
 import { CartographicBorder, CartographicDefs } from "./CartographicAssets";
 import { Minimap } from "./Minimap";
 import { NodeInspector } from "./NodeInspector";
-import { Search, ZoomIn, ZoomOut, Maximize2, Layers } from "lucide-react";
+import { Search, ZoomIn, ZoomOut, Maximize2, Layers, AlertCircle, RefreshCw, Compass } from "lucide-react";
+import { api, USE_MOCK_API } from "@/lib/api";
+import type { MapPayload } from "@/lib/api/types";
+import { useApp } from "@/state/app-state";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const ZOOM_MIN = 0.25;
@@ -84,6 +87,86 @@ export function MarauderMapCanvas() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<MapNode[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Live dynamic student data
+  const { state: localState } = useApp();
+  const [liveMap, setLiveMap] = useState<MapPayload | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [activeCareerRoleId, setActiveCareerRoleId] = useState<string>(
+    localState.profile?.targetRole || "aiml"
+  );
+
+  const fetchLiveMap = useCallback(async (roleId?: string) => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const res = await api.map.getMap(roleId || activeCareerRoleId);
+      setLiveMap(res);
+    } catch (err: any) {
+      setLoadError(err?.message || "Failed to load dynamic Marauder Map data.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeCareerRoleId]);
+
+  useEffect(() => {
+    fetchLiveMap(activeCareerRoleId);
+  }, [activeCareerRoleId, fetchLiveMap]);
+
+  // Map database skills & career progress to visual nodes
+  const dynamicNodes = useMemo<MapNode[]>(() => {
+    return SAMPLE_NODES.map((node) => {
+      // If it's a career destination node
+      if (node.type === "destination") {
+        const isCurrentRole =
+          (node.id === "dest_aiml_engineer" && activeCareerRoleId === "aiml") ||
+          (node.id === "dest_fullstack_dev" && (activeCareerRoleId === "swe" || activeCareerRoleId === "frontend"));
+
+        return {
+          ...node,
+          description: liveMap?.roleTitle
+            ? `${node.description} — Active Progress: ${liveMap.coveragePercent}% requirements coverage.`
+            : node.description,
+          selfAssessedLevel: isCurrentRole ? (liveMap?.coveragePercent && liveMap.coveragePercent >= 80 ? 4 : 2) : 1,
+        };
+      }
+
+      // Map node id (e.g. skill_python -> python)
+      const canonicalSkillId = node.id.replace(/^skill_/, "").replace(/_/g, "-");
+
+      // Check detail from liveMap API response
+      const liveDetail = liveMap?.details?.find(
+        (d) => d.skillId === canonicalSkillId || node.id.includes(d.skillId)
+      );
+
+      // Check local state fallback
+      const localSkill = localState.skills[canonicalSkillId];
+
+      const assessedLevel = liveDetail !== undefined
+        ? liveDetail.assessedLevel
+        : localSkill?.level !== undefined
+        ? localSkill.level
+        : node.selfAssessedLevel;
+
+      const hasEvidence = liveDetail !== undefined
+        ? liveDetail.hasEvidence
+        : Boolean(localSkill?.evidence && localSkill.evidence.trim().length > 0);
+
+      return {
+        ...node,
+        selfAssessedLevel: (Math.max(0, Math.min(4, assessedLevel)) as any),
+        submittedEvidence: hasEvidence
+          ? {
+              title: "Attached Project Artifact",
+              url: localSkill?.evidence || "https://github.com/student/evidence",
+            }
+          : null,
+        reviewStatus: hasEvidence ? "submitted_unreviewed" : "unsubmitted",
+        verifiedStatus: "not_verified",
+      };
+    });
+  }, [liveMap, localState.skills, activeCareerRoleId]);
 
   const prefersReducedMotion = useRef(
     typeof window !== "undefined" &&
@@ -232,14 +315,14 @@ export function MarauderMapCanvas() {
     }
     const q = searchQuery.toLowerCase();
     setSearchResults(
-      SAMPLE_NODES.filter(
+      dynamicNodes.filter(
         (n) =>
           n.label.toLowerCase().includes(q) ||
           n.category.toLowerCase().includes(q) ||
           n.description.toLowerCase().includes(q)
       ).slice(0, 6)
     );
-  }, [searchQuery]);
+  }, [searchQuery, dynamicNodes]);
 
   function selectAndFocus(node: MapNode) {
     navigateTo(node.x, node.y, 1.4);
@@ -272,13 +355,55 @@ export function MarauderMapCanvas() {
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#f5ede0]">
       {/* ── HUD Toolbar ── */}
       <div className="relative z-20 flex items-center gap-2 border-b border-[#8b5a2b]/30 bg-[#f5ede0]/95 px-4 py-2 backdrop-blur">
-        {/* Map Title */}
-        <span className="font-serif text-sm font-bold text-[#3d291d] mr-2 hidden sm:block">
-          🗺 Marauder Map
-        </span>
-        <span className="rounded-full border border-amber-400/60 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-600 uppercase tracking-wider">
-          Phase 1 · Illustrative Data
-        </span>
+        {/* Map Title & Career Destination */}
+        <div className="flex items-center gap-2">
+          <span className="font-serif text-sm font-bold text-[#3d291d] hidden sm:block">
+            🗺 Marauder Map
+          </span>
+          <div className="flex items-center gap-1.5 rounded-lg border border-[#8b5a2b]/30 bg-[#f0e6d0] px-2.5 py-1 text-xs">
+            <Compass className="size-3.5 text-gold-muted" />
+            <span className="font-serif font-semibold text-[#3d291d]">
+              Target:
+            </span>
+            <select
+              value={activeCareerRoleId}
+              onChange={(e) => setActiveCareerRoleId(e.target.value)}
+              className="bg-transparent font-serif font-bold text-plum-900 border-none outline-none cursor-pointer"
+            >
+              <option value="aiml">AI/ML Engineer</option>
+              <option value="swe">Software Engineer</option>
+              <option value="frontend">Frontend Developer</option>
+              <option value="data-analyst">Data Analyst</option>
+              <option value="product-designer">Product Designer</option>
+              <option value="mobile-dev">Mobile App Developer</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Live Dynamic Status Badges */}
+        {isLoading ? (
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground animate-pulse font-serif">
+            <RefreshCw className="size-3 animate-spin" /> Synchronizing map...
+          </span>
+        ) : loadError ? (
+          <span className="flex items-center gap-1 text-[11px] text-destructive font-serif">
+            <AlertCircle className="size-3" /> Map sync offline
+          </span>
+        ) : liveMap ? (
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-gold/40 bg-gold/15 px-2.5 py-0.5 text-[10px] font-mono font-bold text-gold uppercase tracking-wider">
+              {liveMap.coveragePercent}% Requirements Coverage
+            </span>
+            <span className="rounded-full border border-[#5a6978]/40 bg-[#5a6978]/10 px-2 py-0.5 text-[10px] font-mono font-bold text-[#3d291d] uppercase tracking-wider hidden md:inline">
+              Evidence: {liveMap.evidenceCount ?? 0} proof(s) attached ({liveMap.evidencePercent ?? 0}%)
+            </span>
+            {!liveMap.isOnboarded && (
+              <span className="rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-700 uppercase tracking-wider">
+                Starting Gate: Onboarding Incomplete
+              </span>
+            )}
+          </div>
+        ) : null}
 
         {/* Search */}
         <div className="relative ml-auto flex items-center gap-1">
@@ -466,11 +591,11 @@ export function MarauderMapCanvas() {
                   {zoomLevel !== "quest" && (
                     <text
                       x={rx + rw / 2}
-                      y={ry + 18}
+                      y={ry + Math.max(22, 26 * zoom)}
                       textAnchor="middle"
                       fontFamily="Cinzel, serif"
                       fontWeight="bold"
-                      fontSize={Math.max(8, 13 * zoom)}
+                      fontSize={Math.max(12, 18 * zoom)}
                       fill={r.colorTheme}
                       fillOpacity="0.9"
                       aria-hidden="true"
@@ -482,11 +607,11 @@ export function MarauderMapCanvas() {
                   {zoomLevel === "territory" && (
                     <text
                       x={rx + rw / 2}
-                      y={ry + 32}
+                      y={ry + Math.max(38, 44 * zoom)}
                       textAnchor="middle"
                       fontFamily="IM Fell English, serif"
                       fontStyle="italic"
-                      fontSize={Math.max(6, 9 * zoom)}
+                      fontSize={Math.max(10, 13 * zoom)}
                       fill={r.colorTheme}
                       fillOpacity="0.6"
                       aria-hidden="true"
@@ -499,11 +624,11 @@ export function MarauderMapCanvas() {
                     <>
                       <text
                         x={rx + rw / 2}
-                        y={ry + 20}
+                        y={ry + Math.max(24, 28 * zoom)}
                         textAnchor="middle"
                         fontFamily="Cinzel, serif"
                         fontWeight="bold"
-                        fontSize={Math.max(10, 14 * zoom)}
+                        fontSize={Math.max(14, 20 * zoom)}
                         fill={r.colorTheme}
                         fillOpacity="0.95"
                       >
@@ -511,11 +636,11 @@ export function MarauderMapCanvas() {
                       </text>
                       <text
                         x={rx + rw / 2}
-                        y={ry + 36}
+                        y={ry + Math.max(42, 48 * zoom)}
                         textAnchor="middle"
                         fontFamily="IM Fell English, serif"
                         fontStyle="italic"
-                        fontSize={Math.max(7, 10 * zoom)}
+                        fontSize={Math.max(11, 14 * zoom)}
                         fill={r.colorTheme}
                         fillOpacity="0.65"
                       >
@@ -558,7 +683,7 @@ export function MarauderMapCanvas() {
             })}
 
             {/* Layer 3: Nodes */}
-            {SAMPLE_NODES.map((node) => {
+            {dynamicNodes.map((node) => {
               const { sx, sy } = worldToScreen(node.x, node.y);
               const isSelected = selectedNode?.id === node.id;
               const isDest = node.type === "destination";
@@ -638,7 +763,7 @@ export function MarauderMapCanvas() {
                         dominantBaseline="central"
                         fontFamily="Cinzel, serif"
                         fontWeight="bold"
-                        fontSize={Math.max(6, baseR * 0.75)}
+                        fontSize={Math.max(9, baseR * 0.85)}
                         fill={color}
                       >
                         {node.category[0] ?? "?"}
@@ -660,13 +785,14 @@ export function MarauderMapCanvas() {
                   {/* Node label — territory and quest zoom levels */}
                   {zoomLevel !== "world" && (
                     <text
-                      y={baseR + Math.max(10, 14 * zoom)}
+                      y={baseR + Math.max(14, 18 * zoom)}
                       textAnchor="middle"
                       fontFamily="IM Fell English, serif"
-                      fontSize={Math.max(9, 11 * zoom)}
+                      fontWeight="600"
+                      fontSize={Math.max(12, 15 * zoom)}
                       fill={color}
                       stroke="#f5ede0"
-                      strokeWidth={3}
+                      strokeWidth={3.5}
                       paintOrder="stroke"
                     >
                       {node.label}
@@ -676,13 +802,13 @@ export function MarauderMapCanvas() {
                   {/* Quest prompt snippet — quest zoom only */}
                   {zoomLevel === "quest" && node.questTitle && (
                     <text
-                      y={baseR + Math.max(23, 28 * zoom)}
+                      y={baseR + Math.max(30, 36 * zoom)}
                       textAnchor="middle"
                       fontFamily="IM Fell English, serif"
                       fontStyle="italic"
-                      fontSize={Math.max(7, 8.5 * zoom)}
+                      fontSize={Math.max(10, 12 * zoom)}
                       fill="#8b5a2b"
-                      opacity="0.8"
+                      opacity="0.9"
                     >
                       ✦ {node.questTitle}
                     </text>
@@ -711,7 +837,15 @@ export function MarauderMapCanvas() {
 
         {/* ── Coverage disclaimer strip ── */}
         <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-amber-400/30 bg-amber-500/8 px-4 py-1 text-center text-[10px] font-serif italic text-amber-700">
-          [ILLUSTRATIVE] Coverage estimates shown are sample values only — not hiring probabilities or verified competency assessments.
+          {liveMap ? (
+            <span>
+              Dynamic student coverage: <strong>{liveMap.coveragePercent}%</strong> of {liveMap.roleTitle} requirements ({liveMap.demonstratedCount} demonstrated, {liveMap.developingCount} developing, {liveMap.evidenceCount ?? 0} proof attached) — Educational gap estimate, not a hiring probability.
+            </span>
+          ) : (
+            <span>
+              Role requirement coverage represents self-assessed and evidence-backed educational progress — not a hiring probability.
+            </span>
+          )}
         </div>
 
         {/* ── Minimap ── */}

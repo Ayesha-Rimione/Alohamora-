@@ -16,6 +16,7 @@ export interface AssessedSkill {
   status?: SkillStatus;
   confidence?: number;
   evidence?: string;
+  hasEvidence?: boolean;
 }
 
 export const LEVEL_TO_STATUS: Record<number, SkillStatus> = {
@@ -39,16 +40,19 @@ export interface CoverageDetail {
   assessedLevel: number;
   ratio: number;
   status: SkillStatus;
+  hasEvidence: boolean;
 }
 
 export interface CoverageResult {
-  percent: number;
+  percent: number; // self-assessed requirement coverage
+  evidencePercent: number; // percentage of requirements with attached project/evidence
   weightedScore: number;
   totalWeight: number;
   details: CoverageDetail[];
   demonstratedCount: number;
   developingCount: number;
   missingCount: number;
+  evidenceCount: number;
 }
 
 export function getAssessedLevel(input?: AssessedSkill | SkillStatus | number | null): number {
@@ -69,12 +73,14 @@ export function computeSkillCoverage(
   if (!required || required.length === 0) {
     return {
       percent: 0,
+      evidencePercent: 0,
       weightedScore: 0,
       totalWeight: 0,
       details: [],
       demonstratedCount: 0,
       developingCount: 0,
       missingCount: 0,
+      evidenceCount: 0,
     };
   }
 
@@ -83,6 +89,7 @@ export function computeSkillCoverage(
   let demonstratedCount = 0;
   let developingCount = 0;
   let missingCount = 0;
+  let evidenceCount = 0;
 
   const details: CoverageDetail[] = [];
 
@@ -95,6 +102,10 @@ export function computeSkillCoverage(
     const assessedLevel = getAssessedLevel(assessedInput);
     const ratio = Math.min(assessedLevel / targetLevel, 1.0);
 
+    const hasEvidence = typeof assessedInput === "object" && assessedInput !== null
+      ? Boolean(assessedInput.hasEvidence || (assessedInput.evidence && assessedInput.evidence.trim().length > 0))
+      : false;
+
     totalWeight += weight;
     weightedScore += weight * ratio;
 
@@ -103,6 +114,8 @@ export function computeSkillCoverage(
     else if (status === "developing") developingCount += 1;
     else missingCount += 1;
 
+    if (hasEvidence) evidenceCount += 1;
+
     details.push({
       skillId,
       weight,
@@ -110,19 +123,23 @@ export function computeSkillCoverage(
       assessedLevel,
       ratio: Number(ratio.toFixed(2)),
       status,
+      hasEvidence,
     });
   }
 
   const percent = totalWeight > 0 ? Math.round((weightedScore / totalWeight) * 100) : 0;
+  const evidencePercent = required.length > 0 ? Math.round((evidenceCount / required.length) * 100) : 0;
 
   return {
     percent,
+    evidencePercent,
     weightedScore: Number(weightedScore.toFixed(2)),
     totalWeight: Number(totalWeight.toFixed(2)),
     details,
     demonstratedCount,
     developingCount,
     missingCount,
+    evidenceCount,
   };
 }
 
@@ -132,65 +149,151 @@ export interface MapMilestone {
   room: string;
   status: "completed" | "active" | "upcoming";
   skills: string[];
+  requirementsDescription: string;
+  isSatisfied: boolean;
 }
 
 export function generateMarauderMapMilestones(
   requiredSkillIds: string[],
   coverage: CoverageResult,
+  options?: { isOnboarded?: boolean },
 ): { currentMilestoneIndex: number; milestones: MapMilestone[] } {
-  // Distribute required skills across 4 learning rooms
-  const total = requiredSkillIds.length;
-  const chunk1 = requiredSkillIds.slice(0, Math.ceil(total * 0.25));
-  const chunk2 = requiredSkillIds.slice(Math.ceil(total * 0.25), Math.ceil(total * 0.6));
-  const chunk3 = requiredSkillIds.slice(Math.ceil(total * 0.6), Math.ceil(total * 0.85));
-  const chunk4 = requiredSkillIds.slice(Math.ceil(total * 0.85));
+  const isOnboarded = options?.isOnboarded ?? true;
 
+  // Split skills deterministically across learning rooms
+  const total = requiredSkillIds.length;
+  const foundationSkills = requiredSkillIds.slice(0, Math.ceil(total * 0.25));
+  const questSkills = requiredSkillIds.slice(Math.ceil(total * 0.25), Math.ceil(total * 0.6));
+  const portfolioSkills = requiredSkillIds.slice(Math.ceil(total * 0.6), Math.ceil(total * 0.85));
+  const interviewSkills = requiredSkillIds.slice(Math.ceil(total * 0.85));
+
+  const detailsMap = new Map(coverage.details.map((d) => [d.skillId, d]));
+
+  // Room 1: Starting Gate — requires onboarding to be completed
+  const startingGateSatisfied = isOnboarded;
+
+  // Room 2: Library of Foundations — all foundation skills must be at least developing (level >= 1)
+  const foundationsSatisfied =
+    foundationSkills.length > 0 &&
+    foundationSkills.every((sId) => {
+      const d = detailsMap.get(sId);
+      return d && d.assessedLevel >= 1;
+    });
+
+  // Room 3: Workshop of Quests — quest skills developing or demonstrated, AND at least one project evidence attached
+  const questsSkillsSatisfied =
+    questSkills.length > 0 &&
+    questSkills.every((sId) => {
+      const d = detailsMap.get(sId);
+      return d && d.assessedLevel >= 2;
+    });
+  const workshopSatisfied = questsSkillsSatisfied && coverage.evidenceCount >= 1;
+
+  // Room 4: Portfolio Gallery — portfolio skills demonstrated (level >= 3) AND at least 2 evidence attachments
+  const portfolioSkillsSatisfied =
+    portfolioSkills.length > 0 &&
+    portfolioSkills.every((sId) => {
+      const d = detailsMap.get(sId);
+      return d && d.assessedLevel >= 3;
+    });
+  const gallerySatisfied = portfolioSkillsSatisfied && coverage.evidenceCount >= 2;
+
+  // Room 5: Interview Hall — advanced/interview skills demonstrated (level >= 4)
+  const interviewSatisfied =
+    interviewSkills.length > 0 &&
+    interviewSkills.every((sId) => {
+      const d = detailsMap.get(sId);
+      return d && d.assessedLevel >= 4;
+    });
+
+  // Room 6: Application Tower — all prior rooms satisfied and career coverage >= 95%
+  const towerSatisfied =
+    startingGateSatisfied &&
+    foundationsSatisfied &&
+    workshopSatisfied &&
+    gallerySatisfied &&
+    interviewSatisfied &&
+    coverage.percent >= 95;
+
+  // Assemble milestones with room progression (active is first non-completed room)
   const milestones: MapMilestone[] = [
     {
       id: "starting-gate",
       title: "Starting Gate",
       room: "Starting Gate",
-      status: "completed",
+      status: startingGateSatisfied ? "completed" : "active",
       skills: [],
+      requirementsDescription: "Complete student registration and academic onboarding.",
+      isSatisfied: startingGateSatisfied,
     },
     {
       id: "library-foundations",
       title: "Library of Foundations",
       room: "Library of Foundations",
-      status: coverage.percent >= 25 ? "completed" : "active",
-      skills: chunk1,
+      status: !startingGateSatisfied
+        ? "upcoming"
+        : foundationsSatisfied
+        ? "completed"
+        : "active",
+      skills: foundationSkills,
+      requirementsDescription: "Establish at least developing proficiency in core foundation skills.",
+      isSatisfied: foundationsSatisfied,
     },
     {
       id: "workshop-quests",
       title: "Workshop of Quests",
       room: "Workshop of Quests",
-      status: coverage.percent >= 60 ? "completed" : coverage.percent >= 25 ? "active" : "upcoming",
-      skills: chunk2,
+      status: !foundationsSatisfied
+        ? "upcoming"
+        : workshopSatisfied
+        ? "completed"
+        : "active",
+      skills: questSkills,
+      requirementsDescription: "Develop intermediate competencies and attach at least 1 project proof.",
+      isSatisfied: workshopSatisfied,
     },
     {
       id: "portfolio-gallery",
       title: "Portfolio Gallery",
       room: "Portfolio Gallery",
-      status: coverage.percent >= 85 ? "completed" : coverage.percent >= 60 ? "active" : "upcoming",
-      skills: chunk3,
+      status: !workshopSatisfied
+        ? "upcoming"
+        : gallerySatisfied
+        ? "completed"
+        : "active",
+      skills: portfolioSkills,
+      requirementsDescription: "Achieve advanced proficiency in craft skills and submit 2+ project links.",
+      isSatisfied: gallerySatisfied,
     },
     {
       id: "interview-hall",
       title: "Interview Hall",
       room: "Interview Hall",
-      status: coverage.percent >= 95 ? "completed" : coverage.percent >= 85 ? "active" : "upcoming",
-      skills: chunk4,
+      status: !gallerySatisfied
+        ? "upcoming"
+        : interviewSatisfied
+        ? "completed"
+        : "active",
+      skills: interviewSkills,
+      requirementsDescription: "Demonstrate professional fluency in systems & specialized requirements.",
+      isSatisfied: interviewSatisfied,
     },
     {
       id: "application-tower",
       title: "Application Tower",
       room: "Application Tower",
-      status: coverage.percent >= 100 ? "completed" : coverage.percent >= 95 ? "active" : "upcoming",
+      status: !interviewSatisfied
+        ? "upcoming"
+        : towerSatisfied
+        ? "completed"
+        : "active",
       skills: [],
+      requirementsDescription: "Attain 95%+ requirements coverage with verified portfolio artifacts.",
+      isSatisfied: towerSatisfied,
     },
   ];
 
-  let currentMilestoneIndex = 1;
+  let currentMilestoneIndex = 0;
   for (let i = 0; i < milestones.length; i++) {
     if (milestones[i]?.status === "active") {
       currentMilestoneIndex = i;

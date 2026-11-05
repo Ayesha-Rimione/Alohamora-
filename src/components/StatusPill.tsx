@@ -42,10 +42,14 @@ export function StatusPill({
 }
 
 export function DemoBadge({ label = "Demo data", className }: { label?: string; className?: string }) {
+  // Hide demo badge for real accounts
+  if (typeof window !== "undefined" && import.meta.env.VITE_USE_MOCK_API === "false") {
+    return null;
+  }
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-lavender/60 bg-lavender/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-plum",
+        "inline-flex items-center gap-1 rounded-full border border-lavender/60 bg-lavender/25 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-plum min-h-[30px]",
         className,
       )}
       title="Prototype data — not a live integration"

@@ -519,13 +519,13 @@ export function Onboarding() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleSaveAndContinueLater}
-              className="flex items-center gap-1.5 rounded-lg border border-gold-muted/40 bg-card/10 px-3 py-1.5 text-xs font-semibold text-gold transition-colors hover:bg-gold/20"
+              className="flex items-center gap-1.5 rounded-lg border border-gold-muted/40 bg-card/10 px-3 py-1.5 text-base font-semibold text-gold transition-colors hover:bg-gold/20"
             >
               <Save className="size-3.5" /> Save & Continue Later
             </button>
             <button
               onClick={() => navigate({ to: "/" })}
-              className="text-xs text-lavender/80 underline-offset-4 hover:underline"
+              className="text-base text-lavender/80 underline-offset-4 hover:underline"
             >
               Exit
             </button>
@@ -550,7 +550,7 @@ export function Onboarding() {
                 />
                 <span
                   className={cn(
-                    "truncate text-[10px] leading-tight hidden sm:block",
+                    "truncate text-sm leading-tight hidden sm:block",
                     i === step ? "font-bold text-gold" : i < step ? "text-cream/90" : "text-lavender/50",
                   )}
                 >
@@ -583,20 +583,20 @@ export function Onboarding() {
                 <h1 className="font-display text-2xl font-bold tracking-wide text-foreground">
                   About You
                 </h1>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-base text-muted-foreground">
                   Your identity is anchored to your authenticated student account. All academic preferences start empty.
                 </p>
               </div>
 
               {/* Account Fields (Read-Only from registration) */}
               <div className="rounded-2xl border border-gold-muted/30 bg-gold/5 p-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-gold uppercase tracking-wider mb-3">
+                <div className="flex items-center gap-2 text-base font-bold text-gold uppercase tracking-wider mb-3">
                   <Lock className="size-3.5" />
                   <span>Account Information (from your registration � read-only)</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Full Name</Label>
+                    <Label className="text-base text-muted-foreground">Full Name</Label>
                     <Input
                       value={name}
                       readOnly
@@ -605,7 +605,7 @@ export function Onboarding() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Student ID</Label>
+                    <Label className="text-base text-muted-foreground">Student ID</Label>
                     <Input
                       value={studentId}
                       readOnly
@@ -614,12 +614,12 @@ export function Onboarding() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">University Email</Label>
+                    <Label className="text-base text-muted-foreground">University Email</Label>
                     <Input
                       value={accountEmail}
                       readOnly
                       disabled
-                      className="bg-background/80 font-mono text-xs cursor-not-allowed text-foreground"
+                      className="bg-background/80 font-mono text-base cursor-not-allowed text-foreground"
                     />
                   </div>
                 </div>
@@ -654,7 +654,7 @@ export function Onboarding() {
                     placeholder="e.g. B.Sc. in Computer Science and Engineering"
                     className="bg-card text-foreground"
                   />
-                  <p className="text-[11px] text-muted-foreground">Your undergraduate program (e.g. CSE, SE, EEE).</p>
+                  <p className="text-sm text-muted-foreground">Your undergraduate program (e.g. CSE, SE, EEE).</p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -692,7 +692,7 @@ export function Onboarding() {
                     <Label className="text-sm font-bold text-foreground">
                       Current Semester <span className="text-gold">*</span>
                     </Label>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {semester ? (
                         <span className="text-gold font-bold">{semester} selected</span>
                       ) : (
@@ -700,7 +700,7 @@ export function Onboarding() {
                       )}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Select your active semester. We will suggest curriculum courses from this semester to build your record.
                   </p>
 
@@ -719,7 +719,7 @@ export function Onboarding() {
                           aria-checked={isSelected}
                           onClick={() => setSemester(semOption)}
                           className={cn(
-                            "rounded-xl border py-2.5 px-3 text-xs font-semibold transition-all text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                            "rounded-xl border py-2.5 px-3 text-base font-semibold transition-all text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
                             isSelected
                               ? "border-gold bg-gold text-plum-950 font-bold shadow-[0_0_12px_rgba(235,203,122,0.6)] ring-1 ring-gold scale-[1.02]"
                               : "border-border bg-card/60 text-foreground hover:border-gold/40 hover:bg-gold/5"
@@ -735,7 +735,7 @@ export function Onboarding() {
                 <div className="space-y-1.5 sm:col-span-2 pt-2">
                   <div className="flex justify-between items-center">
                     <Label htmlFor="ob-hours" className="text-foreground font-semibold">Weekly Learning Goal</Label>
-                    <span className="text-xs font-bold text-gold-muted bg-gold/15 px-2 py-0.5 rounded border border-gold-muted/30">
+                    <span className="text-base font-bold text-gold-muted bg-gold/15 px-2 py-0.5 rounded border border-gold-muted/30">
                       {hours} hrs / week
                     </span>
                   </div>
@@ -773,22 +773,22 @@ export function Onboarding() {
                   <h1 className="font-display text-2xl font-bold tracking-wide text-foreground">
                     Academic Record
                   </h1>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-base text-muted-foreground">
                     Review and add your courses one by one from the official IUBAT B231 CSE curriculum catalogue.
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl border border-gold-muted/40 bg-gold/10 px-3.5 py-1.5 text-right">
-                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                    <span className="block text-sm text-muted-foreground uppercase font-bold tracking-wider">
                       Computed CGPA
                     </span>
                     <span className="font-display text-lg font-bold text-foreground">
                       {calculatedCgpa.totalCredits > 0 ? calculatedCgpa.cgpa.toFixed(2) : "0.00"}
-                      <span className="text-xs text-muted-foreground font-normal"> / 4.00</span>
+                      <span className="text-base text-muted-foreground font-normal"> / 4.00</span>
                     </span>
                   </div>
                   <div className="rounded-xl border border-border bg-background px-3 py-1.5 text-right">
-                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                    <span className="block text-sm text-muted-foreground uppercase font-bold tracking-wider">
                       Total Credits
                     </span>
                     <span className="font-display text-base font-bold text-foreground">
@@ -799,7 +799,7 @@ export function Onboarding() {
               </div>
 
               {/* Note on grading & non-verified skills */}
-              <div className="rounded-xl border border-gold-muted/30 bg-gold/10 p-3 text-xs text-foreground flex items-start gap-2.5">
+              <div className="rounded-xl border border-gold-muted/30 bg-gold/10 p-3 text-base text-foreground flex items-start gap-2.5">
                 <GraduationCap className="size-4 text-gold-muted mt-0.5 shrink-0" />
                 <p>
                   <strong>Note on course records:</strong> Course grades help map subjects you have studied. They are never treated as demonstrated professional skills without portfolio evidence. Zero-credit courses (such as ART 103 or ELP 002) are recorded but excluded from credit-weighted CGPA.
@@ -815,16 +815,16 @@ export function Onboarding() {
                       value={curriculumSearch}
                       onChange={(e) => setCurriculumSearch(e.target.value)}
                       placeholder="Search code or title (e.g. CSC 183, Algorithms)..."
-                      className="pl-8 h-8 text-xs bg-card"
+                      className="pl-8 min-h-[48px] text-base bg-card"
                     />
                   </div>
-                  <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-1 text-xs">
-                    <span className="text-[11px] text-muted-foreground mr-1 whitespace-nowrap">Filter:</span>
+                  <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-1 text-base">
+                    <span className="text-sm text-muted-foreground mr-1 whitespace-nowrap">Filter:</span>
                     <button
                       type="button"
                       onClick={() => setSelectedCurriculumSemester("all")}
                       className={cn(
-                        "px-2 py-0.5 rounded text-[11px] font-semibold transition-colors whitespace-nowrap",
+                        "px-2 py-0.5 rounded text-sm font-semibold transition-colors whitespace-nowrap",
                         selectedCurriculumSemester === "all"
                           ? "bg-gold text-plum-950 font-bold"
                           : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -838,7 +838,7 @@ export function Onboarding() {
                         type="button"
                         onClick={() => setSelectedCurriculumSemester(s)}
                         className={cn(
-                          "px-2 py-0.5 rounded text-[11px] font-semibold transition-colors whitespace-nowrap",
+                          "px-2 py-0.5 rounded text-sm font-semibold transition-colors whitespace-nowrap",
                           selectedCurriculumSemester === s
                             ? "bg-gold text-plum-950 font-bold"
                             : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -851,8 +851,8 @@ export function Onboarding() {
                 </div>
 
                 {/* Suggested course chips */}
-                <div className="flex items-center gap-1.5 overflow-x-auto py-1 text-xs">
-                  <span className="text-[11px] text-muted-foreground font-semibold whitespace-nowrap">
+                <div className="flex items-center gap-1.5 overflow-x-auto py-1 text-base">
+                  <span className="text-sm text-muted-foreground font-semibold whitespace-nowrap">
                     Suggested Courses:
                   </span>
                   {displayedCurriculum.slice(0, 8).map((c) => {
@@ -864,7 +864,7 @@ export function Onboarding() {
                         type="button"
                         onClick={() => loadCourseIntoEditor(c)}
                         className={cn(
-                          "rounded-lg px-2.5 py-1 text-xs font-mono font-bold transition-all whitespace-nowrap flex items-center gap-1",
+                          "rounded-lg px-2.5 py-1 text-base font-mono font-bold transition-all whitespace-nowrap flex items-center gap-1",
                           isActive
                             ? "border border-gold bg-gold text-plum-950 shadow-sm"
                             : isAdded
@@ -889,10 +889,10 @@ export function Onboarding() {
                         <span className="font-mono text-base font-extrabold text-gold">
                           {activeCurriculumCourse.code}
                         </span>
-                        <span className="rounded-full bg-gold/15 border border-gold-muted/30 px-2.5 py-0.5 text-[10px] font-bold text-gold uppercase">
+                        <span className="rounded-full bg-gold/15 border border-gold-muted/30 px-2.5 py-0.5 text-sm font-bold text-gold uppercase">
                           Semester {activeCurriculumCourse.semester}
                         </span>
-                        <span className="rounded-full bg-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                        <span className="rounded-full bg-border px-2 py-0.5 text-sm font-semibold text-muted-foreground">
                           {activeCurriculumCourse.credits} Credit Hours
                         </span>
                       </div>
@@ -902,14 +902,14 @@ export function Onboarding() {
                     </div>
 
                     {courses.some((c) => c.code.toUpperCase() === activeCurriculumCourse.code.toUpperCase()) && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-bold text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-base font-bold text-emerald-400">
                         <CheckCircle2 className="size-3.5" /> In Academic Record
                       </span>
                     )}
                   </div>
 
                   {activeCurriculumCourse.description && (
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       {activeCurriculumCourse.description}
                     </p>
                   )}
@@ -918,7 +918,7 @@ export function Onboarding() {
                   <div className="grid gap-4 sm:grid-cols-3 pt-2">
                     {/* A. Completion Status (Required) */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-foreground">
+                      <Label className="text-base font-bold text-foreground">
                         A. Completion Status <span className="text-gold">*</span>
                       </Label>
                       <div className="grid grid-cols-2 gap-2">
@@ -926,7 +926,7 @@ export function Onboarding() {
                           type="button"
                           onClick={() => setCourseStatus("completed")}
                           className={cn(
-                            "rounded-xl border py-2 text-xs font-bold transition-all text-center",
+                            "rounded-xl border py-2 text-base font-bold transition-all text-center",
                             courseStatus === "completed"
                               ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
                               : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -941,7 +941,7 @@ export function Onboarding() {
                             setCourseGrade("");
                           }}
                           className={cn(
-                            "rounded-xl border py-2 text-xs font-bold transition-all text-center",
+                            "rounded-xl border py-2 text-base font-bold transition-all text-center",
                             courseStatus === "not_completed"
                               ? "border-amber-500 bg-amber-500 text-white shadow-sm"
                               : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -954,24 +954,24 @@ export function Onboarding() {
 
                     {/* B. Grade Selector (Required if completed, disabled if not completed) */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-foreground">
+                      <Label className="text-base font-bold text-foreground">
                         B. Academic Grade {courseStatus === "completed" && <span className="text-gold">*</span>}
                       </Label>
                       {courseStatus === "completed" ? (
                         <Select value={courseGrade} onValueChange={setCourseGrade}>
-                          <SelectTrigger className="h-9 text-xs bg-background text-foreground font-semibold">
+                          <SelectTrigger className="h-9 text-base bg-background text-foreground font-semibold">
                             <SelectValue placeholder="Select Grade" />
                           </SelectTrigger>
                           <SelectContent>
                             {GRADE_OPTIONS.map((g) => (
-                              <SelectItem key={g.letter} value={g.letter} className="text-xs">
+                              <SelectItem key={g.letter} value={g.letter} className="text-base">
                                 {g.label}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="h-9 rounded-md border border-dashed border-border bg-background/50 px-3 flex items-center text-xs text-muted-foreground italic">
+                        <div className="h-9 rounded-md border border-dashed border-border bg-background/50 px-3 flex items-center text-base text-muted-foreground italic">
                           No grade (Not completed)
                         </div>
                       )}
@@ -980,14 +980,14 @@ export function Onboarding() {
                     {/* C. Personal Course Rating (Optional) */}
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs font-bold text-foreground">
+                        <Label className="text-base font-bold text-foreground">
                           C. Personal Rating <span className="text-muted-foreground font-normal">(Optional)</span>
                         </Label>
                         {courseRating && (
                           <button
                             type="button"
                             onClick={() => setCourseRating(null)}
-                            className="text-[10px] text-muted-foreground hover:underline"
+                            className="text-sm text-muted-foreground hover:underline"
                           >
                             Clear
                           </button>
@@ -1012,7 +1012,7 @@ export function Onboarding() {
                             />
                           </button>
                         ))}
-                        <span className="text-[11px] text-muted-foreground ml-1">
+                        <span className="text-sm text-muted-foreground ml-1">
                           {courseRating ? `${courseRating}/5` : "Unrated"}
                         </span>
                       </div>
@@ -1042,7 +1042,7 @@ export function Onboarding() {
                           if (idx > 0) loadCourseIntoEditor(displayedCurriculum[idx - 1]!);
                         }}
                         disabled={displayedCurriculum.findIndex((c) => c.code === activeCurriculumCourse.code) <= 0}
-                        className="text-xs"
+                        className="text-base"
                       >
                         ← Prev Course
                       </Button>
@@ -1057,7 +1057,7 @@ export function Onboarding() {
                           }
                         }}
                         disabled={displayedCurriculum.findIndex((c) => c.code === activeCurriculumCourse.code) >= displayedCurriculum.length - 1}
-                        className="text-xs"
+                        className="text-base"
                       >
                         Next Course →
                       </Button>
@@ -1069,16 +1069,16 @@ export function Onboarding() {
               {/* Student's Added Courses Summary Tray */}
               <div className="space-y-2 pt-2">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  <h3 className="text-base font-bold uppercase tracking-wider text-muted-foreground">
                     Your Added Academic Record ({courses.length})
                   </h3>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-base text-muted-foreground">
                     Explicitly added courses only
                   </span>
                 </div>
 
                 {courses.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                  <div className="rounded-2xl border border-dashed border-border p-6 text-center text-base text-muted-foreground">
                     No courses added to your record yet. Select a course from the curriculum suggestions above and click "Add to Record".
                   </div>
                 ) : (
@@ -1086,14 +1086,14 @@ export function Onboarding() {
                     {courses.map((c) => (
                       <div
                         key={c.code}
-                        className="flex items-center justify-between rounded-xl border border-border bg-background p-3 text-xs transition-colors hover:border-gold-muted/40"
+                        className="flex items-center justify-between rounded-xl border border-border bg-background p-3 text-base transition-colors hover:border-gold-muted/40"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-gold font-mono">{c.code}</span>
                             <span className="text-foreground truncate font-medium">{c.name}</span>
                           </div>
-                          <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                             <span>{c.credits} cr</span>
                             <span>•</span>
                             {c.status === "completed" ? (
@@ -1119,7 +1119,7 @@ export function Onboarding() {
                               const found = IUBAT_CSE_B231_CURRICULUM.find((item) => item.code.toUpperCase() === c.code.toUpperCase());
                               if (found) loadCourseIntoEditor(found);
                             }}
-                            className="text-xs text-gold hover:underline p-1"
+                            className="text-base text-gold hover:underline p-1"
                           >
                             Edit
                           </button>
@@ -1147,7 +1147,7 @@ export function Onboarding() {
                 <h1 className="font-display text-2xl font-bold tracking-wide text-foreground">
                   Your Skills
                 </h1>
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <p className="mt-0.5 text-base text-muted-foreground">
                   Browse the skill catalogue and select only the skills you genuinely possess. All skills start unselected.
                 </p>
               </div>
@@ -1155,16 +1155,16 @@ export function Onboarding() {
               {/* Selected Skills Tray */}
               <div className="rounded-2xl border border-gold-muted/30 bg-gold/5 p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-gold">
+                  <h2 className="text-base font-bold uppercase tracking-wider text-gold">
                     Your Selected Skills ({Object.keys(assessed).length})
                   </h2>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-base text-muted-foreground">
                     Only selected skills will be saved to your profile
                   </span>
                 </div>
 
                 {Object.keys(assessed).length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic py-1">
+                  <p className="text-base text-muted-foreground italic py-1">
                     No skills selected yet. Search or browse the catalogue below to add your genuine skills.
                   </p>
                 ) : (
@@ -1175,15 +1175,15 @@ export function Onboarding() {
                       return (
                         <div
                           key={id}
-                          className="flex items-center gap-2 rounded-xl border border-gold-muted/40 bg-card px-3 py-1.5 text-xs"
+                          className="flex items-center gap-2 rounded-xl border border-gold-muted/40 bg-card px-3 py-1.5 text-base"
                         >
                           <div>
                             <span className="font-bold text-foreground">{def.name}</span>
-                            <span className="text-[11px] text-gold-muted ml-1.5">
+                            <span className="text-sm text-gold-muted ml-1.5">
                               Level {item.level}/5
                             </span>
                             {item.hasProof === "yes" && (
-                              <span className="ml-1.5 rounded bg-emerald-500/20 text-emerald-400 px-1 py-0.2 text-[10px] font-semibold">
+                              <span className="ml-1.5 rounded bg-emerald-500/20 text-emerald-400 px-1 py-0.2 text-sm font-semibold">
                                 Proof attached
                               </span>
                             )}
@@ -1191,7 +1191,7 @@ export function Onboarding() {
                           <button
                             type="button"
                             onClick={() => openSkillEditor(def)}
-                            className="text-gold hover:underline text-[11px] ml-1"
+                            className="text-gold hover:underline text-sm ml-1"
                           >
                             Edit
                           </button>
@@ -1214,20 +1214,20 @@ export function Onboarding() {
                 <div className="rounded-2xl border-2 border-gold bg-card p-5 space-y-4 shadow-magic animate-in fade-in-50">
                   <div className="flex items-start justify-between gap-3 border-b border-border pb-3">
                     <div>
-                      <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-bold text-gold uppercase tracking-wider">
+                      <span className="rounded-full bg-gold/15 px-2 py-0.5 text-sm font-bold text-gold uppercase tracking-wider">
                         {activeEditingSkillDef.category}
                       </span>
                       <h2 className="text-lg font-bold text-foreground mt-1">
                         {activeEditingSkillDef.name}
                       </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-base text-muted-foreground mt-0.5">
                         {activeEditingSkillDef.why}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setEditingSkillId(null)}
-                      className="text-muted-foreground hover:text-foreground text-xs"
+                      className="text-muted-foreground hover:text-foreground text-base"
                     >
                       Close ✕
                     </button>
@@ -1235,7 +1235,7 @@ export function Onboarding() {
 
                   {/* 1. Skill Self-Assessment Rating (1-5) */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-foreground">
+                    <Label className="text-base font-bold text-foreground">
                       Self-Assessed Proficiency Rating (1 to 5) <span className="text-gold">*</span>
                     </Label>
                     <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
@@ -1259,22 +1259,22 @@ export function Onboarding() {
                                 : "border-border bg-background hover:border-gold/30 text-foreground"
                             )}
                           >
-                            <span className="block text-xs font-bold">{item.label}</span>
-                            <span className={cn("block text-[10px]", isChosen ? "text-plum-900" : "text-muted-foreground")}>
+                            <span className="block text-base font-bold">{item.label}</span>
+                            <span className={cn("block text-sm", isChosen ? "text-plum-900" : "text-muted-foreground")}>
                               {item.desc}
                             </span>
                           </button>
                         );
                       })}
                     </div>
-                    <p className="text-[11px] text-amber-400/90 font-medium pt-1">
+                    <p className="text-sm text-amber-400/90 font-medium pt-1">
                       * Note: This is your self-assessment, not an independently evaluated skill level.
                     </p>
                   </div>
 
                   {/* 2. Optional Proof of Skill */}
                   <div className="space-y-3 pt-2 border-t border-border">
-                    <Label className="text-xs font-bold text-foreground">
+                    <Label className="text-base font-bold text-foreground">
                       Do you have a project or demo that demonstrates this skill?
                     </Label>
                     <div className="flex flex-wrap gap-2">
@@ -1288,7 +1288,7 @@ export function Onboarding() {
                           type="button"
                           onClick={() => setEditSkillProofChoice(choice.key as any)}
                           className={cn(
-                            "rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all",
+                            "rounded-lg border px-3 py-1.5 text-base font-semibold transition-all",
                             editSkillProofChoice === choice.key
                               ? "border-gold bg-gold/20 text-gold font-bold"
                               : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -1302,30 +1302,30 @@ export function Onboarding() {
                     {editSkillProofChoice === "yes" && (
                       <div className="space-y-2.5 rounded-xl border border-border bg-background/50 p-3.5 animate-in fade-in-50">
                         <div>
-                          <Label className="text-[11px] font-semibold text-foreground">Project / Demo Title (Optional)</Label>
+                          <Label className="text-sm font-semibold text-foreground">Project / Demo Title (Optional)</Label>
                           <Input
                             value={editSkillProofTitle}
                             onChange={(e) => setEditSkillProofTitle(e.target.value)}
                             placeholder="e.g. Student Management REST API"
-                            className="h-8 text-xs bg-card"
+                            className="min-h-[48px] text-base bg-card"
                           />
                         </div>
                         <div>
-                          <Label className="text-[11px] font-semibold text-foreground">Description (Optional)</Label>
+                          <Label className="text-sm font-semibold text-foreground">Description (Optional)</Label>
                           <Input
                             value={editSkillProofDesc}
                             onChange={(e) => setEditSkillProofDesc(e.target.value)}
                             placeholder="e.g. Built with Express and MySQL, includes JWT authentication"
-                            className="h-8 text-xs bg-card"
+                            className="min-h-[48px] text-base bg-card"
                           />
                         </div>
                         <div>
-                          <Label className="text-[11px] font-semibold text-foreground">Project / GitHub URL (Optional)</Label>
+                          <Label className="text-sm font-semibold text-foreground">Project / GitHub URL (Optional)</Label>
                           <Input
                             value={editSkillProofUrl}
                             onChange={(e) => setEditSkillProofUrl(e.target.value)}
                             placeholder="https://github.com/your-username/project"
-                            className="h-8 text-xs bg-card"
+                            className="min-h-[48px] text-base bg-card"
                           />
                         </div>
                       </div>
@@ -1341,7 +1341,7 @@ export function Onboarding() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveSkill(activeEditingSkillDef.id)}
-                          className="text-destructive hover:bg-destructive/10 text-xs"
+                          className="text-destructive hover:bg-destructive/10 text-base"
                         >
                           Remove Skill
                         </Button>
@@ -1353,7 +1353,7 @@ export function Onboarding() {
                         variant="outline"
                         size="sm"
                         onClick={() => setEditingSkillId(null)}
-                        className="text-xs"
+                        className="text-base"
                       >
                         Cancel
                       </Button>
@@ -1361,7 +1361,7 @@ export function Onboarding() {
                         type="button"
                         size="sm"
                         onClick={handleSaveSkill}
-                        className="font-bold btn-sparkle text-xs"
+                        className="font-bold btn-sparkle text-base"
                       >
                         Save Skill to Profile
                       </Button>
@@ -1379,17 +1379,17 @@ export function Onboarding() {
                       value={skillSearch}
                       onChange={(e) => setSkillSearch(e.target.value)}
                       placeholder="Search skill (e.g. Python, SQL, React)..."
-                      className="pl-8 h-8 text-xs bg-card"
+                      className="pl-8 min-h-[48px] text-base bg-card"
                     />
                   </div>
-                  <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-1 text-xs">
+                  <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-1 text-base">
                     {["All", "Coding", "Data", "AI/ML", "Craft", "Working like a pro"].map((cat) => (
                       <button
                         key={cat}
                         type="button"
                         onClick={() => setSkillCategoryFilter(cat)}
                         className={cn(
-                          "px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap",
+                          "px-2.5 py-1 rounded-lg text-base font-semibold transition-colors whitespace-nowrap",
                           skillCategoryFilter === cat
                             ? "bg-gold text-plum-950 font-bold"
                             : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -1426,22 +1426,22 @@ export function Onboarding() {
                         <div>
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-bold text-sm text-foreground">{skill.name}</span>
-                            <span className="rounded-full bg-border px-2 py-0.5 text-[10px] text-muted-foreground uppercase">
+                            <span className="rounded-full bg-border px-2 py-0.5 text-sm text-muted-foreground uppercase">
                               {skill.category}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          <p className="text-base text-muted-foreground mt-1 line-clamp-2">
                             {skill.why}
                           </p>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+                        <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 text-base">
                           {isSelected ? (
-                            <span className="text-gold font-bold text-xs">
+                            <span className="text-gold font-bold text-base">
                               Selected: Level {currentItem?.level}/5
                             </span>
                           ) : (
-                            <span className="text-muted-foreground text-[11px]">
+                            <span className="text-muted-foreground text-sm">
                               Not selected
                             </span>
                           )}
@@ -1451,7 +1451,7 @@ export function Onboarding() {
                             size="sm"
                             variant={isSelected ? "outline" : "default"}
                             onClick={() => openSkillEditor(skill)}
-                            className={cn("h-7 text-xs font-bold", !isSelected && "btn-sparkle")}
+                            className={cn("min-h-[44px] text-base font-bold", !isSelected && "btn-sparkle")}
                           >
                             {isSelected ? "Edit Skill" : "+ Add Skill"}
                           </Button>
@@ -1471,7 +1471,7 @@ export function Onboarding() {
                 <h1 className="font-display text-2xl font-bold tracking-wide text-foreground">
                   Choose Destination
                 </h1>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-base text-muted-foreground">
                   Pick the career role you want to prepare for. Your live Marauder Map will track your skill coverage against this role.
                 </p>
               </div>
@@ -1495,7 +1495,7 @@ export function Onboarding() {
                         <span className="font-display font-bold text-base text-foreground">{c.title}</span>
                         {isSelected && <Check className="size-4 text-gold" />}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      <p className="text-base text-muted-foreground mt-1 leading-relaxed">
                         {c.blurb}
                       </p>
                       <div className="mt-3 flex flex-wrap gap-1">
@@ -1506,7 +1506,7 @@ export function Onboarding() {
                             <span
                               key={reqSkillId}
                               className={cn(
-                                "rounded px-1.5 py-0.5 text-[10px] font-mono",
+                                "rounded px-1.5 py-0.5 text-sm font-mono",
                                 hasSkill
                                   ? "bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30"
                                   : "bg-border text-muted-foreground"
@@ -1523,13 +1523,13 @@ export function Onboarding() {
               </div>
 
               {role && (
-                <div className="rounded-xl border border-gold-muted/30 bg-gold/5 p-4 text-xs text-foreground flex items-center justify-between">
+                <div className="rounded-xl border border-gold-muted/30 bg-gold/5 p-4 text-base text-foreground flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-gold uppercase text-[10px] tracking-wider block">Skill Coverage Preview</span>
+                    <span className="font-bold text-gold uppercase text-sm tracking-wider block">Skill Coverage Preview</span>
                     <span className="text-sm font-bold text-foreground">
                       {coveragePreview.percentage.toFixed(1)}% of required skills covered
                     </span>
-                    <p className="text-muted-foreground text-[11px] mt-0.5">
+                    <p className="text-muted-foreground text-sm mt-0.5">
                       Based on your {Object.keys(assessed).length} selected skill{Object.keys(assessed).length === 1 ? "" : "s"}.
                     </p>
                   </div>
@@ -1537,7 +1537,7 @@ export function Onboarding() {
                     <span className="font-mono text-xl font-extrabold text-gold">
                       {coveragePreview.matched} / {coveragePreview.total}
                     </span>
-                    <span className="block text-[10px] text-muted-foreground uppercase">Skills</span>
+                    <span className="block text-sm text-muted-foreground uppercase">Skills</span>
                   </div>
                 </div>
               )}
@@ -1552,7 +1552,7 @@ export function Onboarding() {
                 <h1 className="font-display text-2xl font-bold tracking-wide text-foreground sm:text-3xl">
                   Your Parchment is Ready!
                 </h1>
-                <p className="mt-1 max-w-md text-xs text-muted-foreground">
+                <p className="mt-1 max-w-md text-base text-muted-foreground">
                   Your academic record and selected skills have been calibrated into your live Marauder Map.
                 </p>
               </div>
@@ -1562,30 +1562,30 @@ export function Onboarding() {
                 <div className="border-b border-border pb-2.5 flex items-center justify-between">
                   <div>
                     <h2 className="font-bold text-foreground text-sm">{name}</h2>
-                    <span className="text-xs text-muted-foreground font-mono">{studentId} • {semester}</span>
+                    <span className="text-base text-muted-foreground font-mono">{studentId} • {semester}</span>
                   </div>
-                  <span className="rounded-full bg-gold/15 border border-gold-muted/30 px-2 py-0.5 text-[10px] font-bold text-gold uppercase">
+                  <span className="rounded-full bg-gold/15 border border-gold-muted/30 px-2 py-0.5 text-sm font-bold text-gold uppercase">
                     {getCareer(role).title}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl border border-border bg-background p-2.5">
-                    <span className="block text-[10px] text-muted-foreground uppercase font-bold">Courses</span>
+                    <span className="block text-sm text-muted-foreground uppercase font-bold">Courses</span>
                     <span className="font-mono text-base font-bold text-foreground">{courses.length}</span>
                   </div>
                   <div className="rounded-xl border border-border bg-background p-2.5">
-                    <span className="block text-[10px] text-muted-foreground uppercase font-bold">CGPA</span>
+                    <span className="block text-sm text-muted-foreground uppercase font-bold">CGPA</span>
                     <span className="font-mono text-base font-bold text-gold">{calculatedCgpa.totalCredits > 0 ? calculatedCgpa.cgpa.toFixed(2) : "0.00"}</span>
                   </div>
                   <div className="rounded-xl border border-border bg-background p-2.5">
-                    <span className="block text-[10px] text-muted-foreground uppercase font-bold">Coverage</span>
+                    <span className="block text-sm text-muted-foreground uppercase font-bold">Coverage</span>
                     <span className="font-mono text-base font-bold text-emerald-400">{coveragePreview.percentage.toFixed(0)}%</span>
                   </div>
                 </div>
 
                 {/* Exact Required Disclaimer */}
-                <div className="rounded-xl border border-border bg-background/60 p-3 text-[11px] text-muted-foreground leading-relaxed">
+                <div className="rounded-xl border border-border bg-background/60 p-3 text-sm text-muted-foreground leading-relaxed">
                   <p className="italic">
                     "This is coverage of the skills defined for this role, not a probability of getting hired."
                   </p>
@@ -1605,7 +1605,7 @@ export function Onboarding() {
 
           {/* Validation Error Message */}
           {error && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-base text-destructive">
               <AlertCircle className="size-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -1618,7 +1618,7 @@ export function Onboarding() {
                 type="button"
                 variant="outline"
                 onClick={prev}
-                className="text-xs font-semibold"
+                className="text-base font-semibold"
               >
                 <ArrowLeft className="size-3.5 mr-1.5" /> Back
               </Button>
@@ -1630,7 +1630,7 @@ export function Onboarding() {
               <Button
                 type="button"
                 onClick={next}
-                className="text-xs font-bold btn-sparkle"
+                className="text-base font-bold btn-sparkle"
               >
                 Next <ArrowRight className="size-3.5 ml-1.5" />
               </Button>

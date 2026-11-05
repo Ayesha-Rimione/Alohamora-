@@ -72,13 +72,13 @@
 :root {
   --radius: 0.75rem;
 
-  /* Surfaces & text */
-  --background: oklch(0.957 0.019 83.1); /* parchment */
-  --foreground: oklch(0.229 0.052 301.2); /* plum-deep */
-  --card: oklch(0.984 0.015 80.7); /* cream */
-  --card-foreground: oklch(0.229 0.052 301.2);
-  --popover: oklch(0.984 0.015 80.7);
-  --popover-foreground: oklch(0.229 0.052 301.2);
+  /* Surfaces & text — Solid cream #FFF9EF for cards with 96% opacity, plum text #211631 */
+  --background: oklch(0.957 0.019 83.1); /* parchment fallback */
+  --foreground: #211631; /* plum-deep */
+  --card: #FFF9EF; /* solid cream */
+  --card-foreground: #211631; /* plum-deep */
+  --popover: #FFF9EF;
+  --popover-foreground: #211631;
 
   /* Primary = antique gold for important actions */
   --primary: oklch(0.852 0.107 88.5); /* gold */
@@ -123,6 +123,7 @@
 
   html {
     scroll-behavior: smooth;
+    font-size: 106.25%; /* 17px root font size */
   }
 
   body {
@@ -133,6 +134,8 @@
     background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 1rem; /* 17px body */
+    line-height: 1.6;
   }
 
   :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
@@ -166,6 +169,25 @@
   .bg-card .text-foreground,
   .bg-popover .text-foreground {
     color: var(--color-foreground);
+  }
+
+  /* Universal readability floors: no user-facing text below 14px */
+  .text-xs,
+  .text-\[10px\],
+  .text-\[11px\],
+  .text-\[12px\],
+  .text-\[13px\] {
+    font-size: 0.875rem !important; /* 14px floor */
+    line-height: 1.25rem !important;
+  }
+
+  /* Tap targets floor: at least 44px on interactive controls */
+  button,
+  [role="button"],
+  a.btn,
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   input,
