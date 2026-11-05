@@ -82,6 +82,7 @@ Open `backend\.env` and fill in your MySQL password:
 DATABASE_URL="mysql://root:YOUR_MYSQL_PASSWORD@localhost:3306/alohomora_db"
 SESSION_SECRET="change-this-to-a-long-random-string-minimum-32-characters"
 GROQ_API_KEY="gsk_your_groq_api_key_here"  # Get from https://console.groq.com
+GROQ_MODEL="openai/gpt-oss-120b"
 ```
 
 > **Important:** Never commit `backend/.env` to git. It is listed in `.gitignore`.
@@ -144,7 +145,7 @@ Restart the frontend dev server. The app will now use the real backend instead o
 
 1. Visit **https://console.groq.com** and create a free account
 2. Generate an API key
-3. Add `GROQ_API_KEY=gsk_your_key_here` to `backend/.env`
+3. Add `GROQ_API_KEY=gsk_your_key_here` and `GROQ_MODEL=openai/gpt-oss-120b` to `backend/.env`
 4. Restart the backend
 
 Without a Groq API key, Professor Who? returns a friendly development placeholder message instead of crashing.

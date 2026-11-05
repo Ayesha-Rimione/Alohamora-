@@ -191,7 +191,7 @@ export class ProfessorService {
         reply = completion.choices[0]?.message?.content || "";
       } catch (groqErr) {
         console.error("Groq API error:", groqErr);
-        reply = `I encountered an issue connecting to the Groq inference service (${(groqErr as Error)?.message}). Let's work through this conceptually: for ${courseContext || "your question"}, make sure to verify fundamental principles, break down each step, and consult verified syllabus notes.`;
+        reply = `I am having trouble connecting to my academic knowledge base at the moment. Let's work through this conceptually: for ${courseContext || "your question"}, make sure to verify fundamental principles, break down each step, and consult verified syllabus notes.`;
       }
     } else {
       // Development fallback when GROQ_API_KEY is not yet added to .env

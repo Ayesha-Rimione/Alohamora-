@@ -14,7 +14,7 @@ const envSchema = z.object({
   SESSION_COOKIE_NAME: z.string().default("alohomora_session"),
   SESSION_MAX_AGE_DAYS: z.coerce.number().default(7),
   GROQ_API_KEY: z.string().optional().default(""),
-  GROQ_MODEL: z.string().default("llama-3.3-70b-versatile"),
+  GROQ_MODEL: z.string().default("openai/gpt-oss-120b"),
   SMTP_HOST: z.string().optional().default(""),
   SMTP_PORT: z.coerce.number().default(587),
   SMTP_USER: z.string().optional().default(""),
