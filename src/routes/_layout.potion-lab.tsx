@@ -403,7 +403,7 @@ function PotionLab() {
                               key={task.id}
                               className={cn(
                                 "flex items-start gap-3 rounded-xl border p-4 transition-colors",
-                                isDone ? "border-success/40 bg-success/5" : "border-border bg-background",
+                                isDone ? "border-success/40 bg-success/5" : "border-border bg-card",
                               )}
                             >
                               <Checkbox

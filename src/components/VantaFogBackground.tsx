@@ -30,7 +30,16 @@ export function VantaFogBackground() {
           (window as any).THREE = THREE;
         }
 
-        const FOG = (await import("vanta/dist/vanta.fog.min" as any)).default;
+        const vantaModule = await import("vanta/dist/vanta.fog.min.js" as any);
+        const FOG =
+          vantaModule.default?.default ||
+          vantaModule.default ||
+          (window as any).VANTA?.FOG ||
+          vantaModule;
+
+        if (typeof FOG !== "function") {
+          throw new Error("VANTA.FOG function could not be resolved from module");
+        }
 
         if (!isCancelled && vantaRef.current) {
           effect = FOG({
@@ -92,7 +101,7 @@ export function VantaFogBackground() {
       data-vanta-state={state}
       className="fixed inset-0 pointer-events-none"
       style={{
-        zIndex: 0,
+        zIndex: -10,
         ...(state === "reduced-motion" || state === "failed" ? staticGradientStyle : {}),
       }}
       aria-hidden="true"
