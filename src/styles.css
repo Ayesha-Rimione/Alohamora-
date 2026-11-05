@@ -1,0 +1,376 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Alohomora! design system — "enchanted parchment on deep plum".
+ * All colors use oklch. Semantic tokens are mapped in @theme inline.
+ * Brand hexes: plum-deep #211631, plum-dark #30203F, purple-rich #553579,
+ * lavender #B8A0D9, parchment #F7F0E3, gold #EBCB7A, gold-muted #B99145,
+ * cream #FFF9EF, success #398366, fairy #A99CB8.
+ */
+
+@theme {
+  --font-display: "Cinzel", "Georgia", serif;
+  --font-lore: "IM Fell English", "Georgia", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand tokens */
+  --color-plum: var(--plum);
+  --color-plum-deep: var(--plum-deep);
+  --color-plum-dark: var(--plum-dark);
+  --color-purple-rich: var(--purple-rich);
+  --color-lavender: var(--lavender);
+  --color-parchment: var(--parchment);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+  --color-gold-soft: var(--gold-soft);
+  --color-cream: var(--cream);
+  --color-fairy: var(--fairy);
+
+  --color-chart-1: var(--gold);
+  --color-chart-2: var(--lavender);
+  --color-chart-3: var(--purple-rich);
+  --color-chart-4: var(--gold-muted);
+  --color-chart-5: var(--success);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Surfaces & text */
+  --background: oklch(0.957 0.019 83.1); /* parchment */
+  --foreground: oklch(0.229 0.052 301.2); /* plum-deep */
+  --card: oklch(0.984 0.015 80.7); /* cream */
+  --card-foreground: oklch(0.229 0.052 301.2);
+  --popover: oklch(0.984 0.015 80.7);
+  --popover-foreground: oklch(0.229 0.052 301.2);
+
+  /* Primary = antique gold for important actions */
+  --primary: oklch(0.852 0.107 88.5); /* gold */
+  --primary-foreground: oklch(0.229 0.052 301.2);
+  --secondary: oklch(0.747 0.085 303.7); /* lavender */
+  --secondary-foreground: oklch(0.229 0.052 301.2);
+
+  --muted: oklch(0.925 0.024 83);
+  --muted-foreground: oklch(0.45 0.05 300);
+  --accent: oklch(0.401 0.114 303.4); /* purple-rich */
+  --accent-foreground: oklch(0.984 0.015 80.7);
+  --destructive: oklch(0.55 0.19 25);
+  --destructive-foreground: oklch(0.984 0.015 80.7);
+  --success: oklch(0.554 0.087 165);
+  --success-foreground: oklch(0.984 0.015 80.7);
+
+  --border: oklch(0.86 0.045 83);
+  --input: oklch(0.86 0.045 83);
+  --ring: oklch(0.679 0.106 81.4); /* gold-muted */
+
+  /* Raw brand tokens */
+  --plum: oklch(0.229 0.052 301.2);
+  --plum-deep: oklch(0.229 0.052 301.2);
+  --plum-dark: oklch(0.278 0.059 306.8);
+  --purple-rich: oklch(0.401 0.114 303.4);
+  --lavender: oklch(0.747 0.085 303.7);
+  --parchment: oklch(0.957 0.019 83.1);
+  --gold: oklch(0.852 0.107 88.5);
+  --gold-muted: oklch(0.679 0.106 81.4);
+  --gold-soft: oklch(0.91 0.07 88);
+  --cream: oklch(0.984 0.015 80.7);
+  --fairy: oklch(0.713 0.043 306.3);
+
+  --shadow-magic: 0 10px 30px -12px oklch(0.401 0.114 303.4 / 0.25);
+  --shadow-gold-glow: 0 0 0 1px oklch(0.852 0.107 88.5 / 0.55), 0 4px 20px -4px oklch(0.679 0.106 81.4 / 0.45);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(1100px 600px at 85% -10%, oklch(0.88 0.06 88 / 0.35), transparent 70%),
+      radial-gradient(900px 700px at -10% 30%, oklch(0.72 0.085 303.7 / 0.12), transparent 70%);
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--gold-muted);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--gold);
+    color: var(--plum-deep);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.747 0.085 303.7 / 0.6) transparent;
+  }
+
+  /* Form controls and readable surfaces:
+     Ensure dark text on light surfaces and light text on dark surfaces with WCAG AA contrast.
+     Inside dark containers (like .plum-panel), light card surfaces must force dark foreground text
+     so labels, typed text, and dropdowns never wash out. */
+  .bg-card,
+  .bg-popover,
+  [data-slot="card"] {
+    color: var(--color-foreground);
+  }
+
+  .bg-card label,
+  .bg-popover label,
+  .bg-card .text-foreground,
+  .bg-popover .text-foreground {
+    color: var(--color-foreground);
+  }
+
+  input,
+  textarea,
+  select,
+  button[role="combobox"] {
+    color: var(--color-foreground) !important;
+    background-color: var(--color-card) !important;
+    border-color: var(--color-border);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-muted-foreground) !important;
+    opacity: 0.85;
+  }
+
+  /* Browser autofill paints its own background and text color — keep both readable. */
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-foreground) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--color-card) inset !important;
+    transition: background-color 99999s ease-out;
+  }
+}
+
+/* ---------- Magical surfaces ---------- */
+
+/* Warm parchment panel with antique edges */
+.parchment {
+  background:
+    radial-gradient(140% 110% at 18% 0%, oklch(0.975 0.02 84) 0%, oklch(0.945 0.03 82) 78%),
+    oklch(0.945 0.03 82);
+  border: 1px solid oklch(0.8 0.06 82);
+  box-shadow:
+    0 2px 10px oklch(0.4 0.09 302 / 0.08),
+    inset 0 0 0 1px oklch(1 0 0 / 0.35);
+}
+
+/* Deep plum navigation / selected sections */
+.plum-panel {
+  background: linear-gradient(180deg, var(--plum-dark) 0%, var(--plum-deep) 100%);
+  color: var(--cream);
+}
+
+/* Antique gold border with soft inner light */
+.gold-frame {
+  border: 1px solid oklch(0.679 0.106 81.4 / 0.45);
+  box-shadow: inset 0 0 0 1px oklch(0.852 0.107 88.5 / 0.25);
+}
+
+.text-goldgrad {
+  background: linear-gradient(100deg, var(--gold) 0%, var(--gold-soft) 45%, var(--gold-muted) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Micro-interactions ---------- */
+
+/* Tiny gold sparkles that appear on hover */
+.btn-sparkle {
+  position: relative;
+}
+.btn-sparkle::before,
+.btn-sparkle::after {
+  content: "✦";
+  position: absolute;
+  font-size: 0.65rem;
+  color: var(--gold-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.btn-sparkle::before {
+  top: 2px;
+  right: 4px;
+}
+.btn-sparkle::after {
+  bottom: 2px;
+  left: 4px;
+  font-size: 0.5rem;
+}
+.btn-sparkle:hover::before,
+.btn-sparkle:hover::after,
+.btn-sparkle:focus-visible::before,
+.btn-sparkle:focus-visible::after {
+  opacity: 1;
+  animation: twinkle 1.2s ease-in-out infinite;
+}
+
+/* Gentle hover lift + glow for interactive cards */
+.card-magic {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-magic:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.679 0.106 81.4 / 0.5);
+  box-shadow: var(--shadow-magic);
+}
+
+/* Button glow */
+.glow-magic {
+  box-shadow: 0 2px 14px -2px oklch(0.679 0.106 81.4 / 0.5);
+  transition: box-shadow 0.25s ease, transform 0.15s ease;
+}
+.glow-magic:hover {
+  box-shadow: 0 4px 22px -2px oklch(0.679 0.106 81.4 / 0.65);
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-6px) rotate(2deg); }
+  66% { transform: translateY(4px) rotate(-2deg); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes unlock-reveal {
+  0% { opacity: 0; transform: scale(0.96) rotate(-0.5deg); filter: blur(6px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes key-turn {
+  0% { transform: rotate(-35deg) translateY(8px); opacity: 0.4; }
+  70% { transform: rotate(12deg) translateY(0); opacity: 1; }
+  100% { transform: rotate(0deg); opacity: 1; }
+}
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.852 0.107 88.5 / 0.4); }
+  50% { box-shadow: 0 0 0 6px oklch(0.852 0.107 88.5 / 0); }
+}
+
+.animate-bob { animation: bob 4s ease-in-out infinite; }
+.animate-sway { animation: sway 5s ease-in-out infinite; transform-origin: 50% 90%; }
+.animate-floaty { animation: floaty 6s ease-in-out infinite; }
+.animate-twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+.animate-rise-in { animation: rise-in 0.5s ease both; }
+.animate-key-turn { animation: key-turn 0.9s cubic-bezier(0.34, 1.4, 0.4, 1) both; }
+.animate-unlock-reveal { animation: unlock-reveal 0.7s ease both; }
+.animate-pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
+
+.delay-1 { animation-delay: 0.12s; }
+.delay-2 { animation-delay: 0.24s; }
+.delay-3 { animation-delay: 0.36s; }
+
+/* Shimmering progress fill */
+.progress-magic {
+  background-image: linear-gradient(
+    100deg,
+    var(--gold) 0%,
+    var(--gold-soft) 45%,
+    var(--gold) 90%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3.5s linear infinite;
+}
+
+/* Enchanted dotted path connector (Marauder Map) */
+.path-dotted {
+  background-image: linear-gradient(to bottom, var(--gold-muted) 55%, transparent 45%);
+  background-size: 2px 12px;
+  background-repeat: repeat-y;
+  width: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob,
+  .animate-sway,
+  .animate-floaty,
+  .animate-twinkle,
+  .animate-rise-in,
+  .animate-key-turn,
+  .animate-unlock-reveal,
+  .animate-pulse-soft,
+  .progress-magic {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .card-magic,
+  .glow-magic,
+  .btn-sparkle::before,
+  .btn-sparkle::after {
+    transition: none !important;
+  }
+}

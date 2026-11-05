@@ -1,0 +1,453 @@
+// Alohomora! Complete Database Schema
+// Normalized MySQL schema with Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// 1. User & Identity
+// -------------------------------------------------------------
+model User {
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  studentId              String    @unique
+  fullName               String
+  passwordHash           String
+  universityName         String
+  universityId           String?
+  emailVerified          Boolean   @default(false)
+  verificationCode       String?
+  verificationExpiresAt  DateTime?
+  resetPasswordToken     String?
+  resetPasswordExpiresAt DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  university             University?        @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  academicProfile        AcademicProfile?
+  semesters              Semester[]
+  courses                Course[]
+  userSkills             UserSkill[]
+  evidences              SkillEvidence[]
+  learningPlans          LearningPlan[]
+  deadlines              Deadline[]
+  bookmarks              Bookmark[]
+  chatSessions           ChatSession[]
+  uploadedDocuments      UploadedDocument[]
+  studentCourses         StudentCourse[]
+  onboardingProgress     OnboardingProgress?
+
+  @@index([email])
+  @@index([studentId])
+}
+
+// -------------------------------------------------------------
+// 2. University & Grading Systems
+// -------------------------------------------------------------
+model University {
+  id               String       @id @default(cuid())
+  name             String       @unique
+  shortName        String
+  domain           String?
+  gradingScaleJson String?      @db.Text
+  active           Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+
+  users            User[]
+  gradeScales      GradeScale[]
+}
+
+model GradeScale {
+  id           String      @id @default(cuid())
+  universityId String?
+  letter       String
+  points       Float
+  description  String?
+  university   University? @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@index([universityId])
+}
+
+// -------------------------------------------------------------
+// 3. Academic Profile & CGPA
+// -------------------------------------------------------------
+model AcademicProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  degree          String   @default("")
+  academicYear    String   @default("")
+  semester        String   @default("")
+  weeklyHours     Int      @default(8)
+  targetRole      String   @default("")
+  links           String?  @db.Text
+  targetCgpa      Float    @default(0)
+  upcomingCredits Int      @default(0)
+  onboarded       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------
+// 4. Semesters & Courses
+// -------------------------------------------------------------
+model Semester {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  term       String?
+  year       Int?
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courses Course[]
+
+  @@index([userId])
+}
+
+model Course {
+  id           String    @id @default(cuid())
+  userId       String
+  semesterId   String?
+  semesterName String
+  code         String
+  name         String
+  credits      Float     @default(3.0)
+  grade        String
+  confidence   Int       @default(3)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semester Semester? @relation(fields: [semesterId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([semesterId])
+}
+
+// -------------------------------------------------------------
+// 7. Curriculum
+// -------------------------------------------------------------
+model CurriculumCourse {
+  code               String   @id
+  name               String
+  credits            Float
+  semester           Int
+  description        String?  @db.Text
+  topics             String?  @db.Text
+  projects           String?  @db.Text
+  co1                String?  @db.Text
+  co2                String?  @db.Text
+  co3                String?  @db.Text
+  co4                String?  @db.Text
+  co5                String?  @db.Text
+  program            String
+  curriculumVersion  String
+  createdAt          DateTime @default(now())
+
+  // relations
+  studentCourses     StudentCourse[]
+  courseSkillMaps   CourseSkillMap[]
+}
+
+model StudentCourse {
+  id          String   @id @default(cuid())
+  userId      String
+  courseCode  String
+  status      CourseStatus @default(completed)
+  grade       String?
+  gradePoints Float?
+  understanding Int? // 1-5 stars
+  updatedAt   DateTime @updatedAt
+
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  curriculum  CurriculumCourse @relation(fields: [courseCode], references: [code], onDelete: Cascade)
+
+  @@unique([userId, courseCode])
+  @@index([userId])
+}
+
+enum CourseStatus {
+  completed
+  not_taken
+  in_progress
+}
+
+model OnboardingProgress {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  currentStep Int      @default(1)
+  draftJson   String?  @db.Text
+  completedAt DateTime?
+  updatedAt   DateTime @updatedAt
+
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CourseSkillMap {
+  id          String   @id @default(cuid())
+  courseCode  String
+  skillId     String
+  suggestedLevelCap Int // max level to suggest (0‑4)
+
+  curriculum  CurriculumCourse @relation(fields: [courseCode], references: [code], onDelete: Cascade)
+  skill       Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([courseCode, skillId])
+}
+
+// -------------------------------------------------------------
+// 5. Skills & Evidence
+// -------------------------------------------------------------
+model Skill {
+  id                 String            @id // Slug, e.g. "python", "sql", "data-handling"
+  name               String
+  category           String            @default("Core")
+  description        String?           @db.Text
+  defaultTargetLevel Int               @default(4)
+  createdAt          DateTime          @default(now())
+
+  roleRequirements   RoleRequirement[]
+  userSkills         UserSkill[]
+  courseSkillMaps    CourseSkillMap[]
+}
+
+model UserSkill {
+  id              String   @id @default(cuid())
+  userId          String
+  skillId         String
+  level           Int      @default(0) // 0 to 4
+  status          String   @default("missing") // "demonstrated" | "developing" | "missing"
+  confidence      Int      @default(3) // 1 to 5
+  evidenceSummary String?  @db.Text
+  updatedAt       DateTime @updatedAt
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill     Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  evidences SkillEvidence[]
+
+  @@unique([userId, skillId])
+  @@index([userId])
+}
+
+model SkillEvidence {
+  id          String    @id @default(cuid())
+  userId      String
+  userSkillId String?
+  skillId     String
+  url         String
+  notes       String?   @db.Text
+  verified    Boolean   @default(false) // Never claim self-reported as verified
+  submittedAt DateTime  @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userSkill UserSkill? @relation(fields: [userSkillId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userSkillId])
+}
+
+// -------------------------------------------------------------
+// 6. Career Roles & Requirements
+// -------------------------------------------------------------
+model CareerRole {
+  id           String            @id // Slug, e.g. "aiml", "fullstack", "data-analyst"
+  title        String
+  blurb        String            @db.Text
+  createdAt    DateTime          @default(now())
+
+  requirements RoleRequirement[]
+  plans        LearningPlan[]
+}
+
+model RoleRequirement {
+  id          String     @id @default(cuid())
+  roleId      String
+  skillId     String
+  weight      Float      @default(1.0)
+  targetLevel Int        @default(4)
+
+  role  CareerRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  skill Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, skillId])
+  @@index([roleId])
+}
+
+// -------------------------------------------------------------
+// 7. Learning Plans & Tasks (Potion Lab)
+// -------------------------------------------------------------
+model LearningPlan {
+  id           String         @id @default(cuid())
+  userId       String
+  roleId       String
+  hoursPerWeek Int            @default(8)
+  variant      String         @default("standard")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role  CareerRole     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  tasks LearningTask[]
+
+  @@index([userId])
+}
+
+model LearningTask {
+  id         String       @id @default(cuid())
+  planId     String
+  week       Int
+  title      String
+  skillId    String?
+  hours      Int          @default(2)
+  done       Boolean      @default(false)
+  orderIndex Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  plan LearningPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+}
+
+// -------------------------------------------------------------
+// 8. Deadlines & Panic Room
+// -------------------------------------------------------------
+model Deadline {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  course    String
+  date      String
+  time      String?  @default("23:59")
+  type      String   @default("assignment")
+  status    String   @default("pending")
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// -------------------------------------------------------------
+// 9. Opportunities & Resources
+// -------------------------------------------------------------
+model Opportunity {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  role        String
+  type        String   @default("internship")
+  location    String
+  stipend     String?
+  deadline    String?
+  tagsJson    String?  @db.Text
+  isDemo      Boolean  @default(true) // Clearly labelled as demo
+  description String?  @db.Text
+  link        String?
+  createdAt   DateTime @default(now())
+}
+
+model LearningResource {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  provider    String
+  type        String   @default("tutorial")
+  price       String   @default("Free")
+  isSponsored Boolean  @default(false) // Transparently labelled
+  sponsorName String?
+  tagsJson    String?  @db.Text
+  createdAt   DateTime @default(now())
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  itemType  String // "opportunity" | "resource"
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+  @@index([userId])
+}
+
+// -------------------------------------------------------------
+// 10. Professor Who? (AI Study Assistant & Chat History)
+// -------------------------------------------------------------
+model ChatSession {
+  id            String        @id @default(cuid())
+  userId        String
+  title         String        @default("New Study Session")
+  courseContext String?
+  roleContext   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  sessionId   String
+  role        String // "user" | "assistant" | "system"
+  content     String      @db.Text
+  sourcesJson String?     @db.Text
+  createdAt   DateTime    @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+// -------------------------------------------------------------
+// 11. Uploaded Course Documents & RAG Chunks
+// -------------------------------------------------------------
+model UploadedDocument {
+  id            String          @id @default(cuid())
+  userId        String
+  courseContext String?
+  fileName      String
+  originalName  String
+  mimeType      String
+  fileSize      Int
+  filePath      String
+  extractedText String?         @db.LongText
+  chunkCount    Int             @default(0)
+  createdAt     DateTime        @default(now())
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks DocumentChunk[]
+
+  @@index([userId])
+}
+
+model DocumentChunk {
+  id         String           @id @default(cuid())
+  documentId String
+  chunkIndex Int
+  pageNumber Int?
+  content    String           @db.Text
+  createdAt  DateTime         @default(now())
+
+  document UploadedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
